@@ -10,7 +10,8 @@ class Game {
 
         this.state = 'menu'; // 'menu' ou 'playing' (mais estados nas próximas etapas)
         this.capybara = null; // ← NOVA LINHA: a capivara é criada em startGame()
-        
+        this.input = new InputHandler();
+
         const buttonWidth = 200;
         this.playButton = new Button(
             (CONFIG.WIDTH - buttonWidth) / 2, 380, buttonWidth, 60, 'PLAY'
@@ -31,6 +32,7 @@ class Game {
         const startRow = CONFIG.ROWS_VISIBLE - 2;       // linha 12
         this.capybara = new Capybara(startCol, startRow);
 
+        this.input.clear();
         this.state = 'playing';
     }
 
