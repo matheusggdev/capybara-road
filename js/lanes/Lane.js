@@ -16,6 +16,7 @@ class Lane {
 
         this.row = row;
         this.y = -row * CONFIG.TILE; // posição vertical no mundo
+        this.entities = []; // ← NOVO: entidades desta faixa (árvores, carros...)
     }
 
         /**
@@ -30,12 +31,14 @@ class Lane {
     }
 
     /**
-     * Atualiza a faixa a cada quadro.
-     * Por padrão não faz nada (a grama é parada).
+     * Atualiza a faixa a cada quadro: por padrão,
+     * atualiza todas as entidades que estão nela.
      * @param {number} dt tempo desde o último quadro, em segundos
      */
     update(dt) {
-        // vazio de propósito
+        for (const entity of this.entities) {
+            entity.update(dt);
+        }
     }
 
     /**
@@ -46,6 +49,18 @@ class Lane {
      */
     drawBackground(ctx, camera) {
         throw new Error(`${this.constructor.name} precisa implementar drawBackground().`);
+    }
+
+    /**
+     * Desenha as entidades da faixa.
+     * Cada entidade sabe se desenhar (polimorfismo).
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {Camera} camera
+     */
+    drawEntities(ctx, camera) {
+        for (const entity of this.entities) {
+            entity.draw(ctx, camera);
+        }
     }
 
     /**

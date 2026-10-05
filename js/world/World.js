@@ -7,6 +7,10 @@
 class World {
     constructor() {
         this.lanes = new Map();
+
+        // Coluna que nunca recebe obstáculo: garante um caminho até o fim
+        this.safeCol = Utils.randomInt(0, CONFIG.COLS - 1);
+
         this.build();
     }
 
@@ -26,9 +30,10 @@ class World {
         // cerca logo atrás do início
         this.addLane(new BoundaryLane(-1));
 
-        // faixas jogáveis (linhas 0 a 99)
+        // faixas jogáveis (linhas 0 a 99); as primeiras ficam livres
         for (let row = 0; row < finishRow; row++) {
-            this.addLane(new GrassLane(row));
+            const isSafeZone = row < CONFIG.SAFE_START_ROWS;
+            this.addLane(new GrassLane(row, this.safeCol, isSafeZone));
         }
 
         // linha de chegada (linha 100)
@@ -60,12 +65,17 @@ class World {
         }
     }
 
-    /** Desenha as faixas que aparecem na tela. */
+    /**
+     * Desenha em duas passadas: primeiro todos os chãos,
+     * depois todas as entidades, de cima para baixo.
+     * Assim nenhum chão cobre uma entidade de outra faixa.
+     */
     draw(ctx, camera) {
-        for (const lane of this.lanes.values()) {
-            if (lane.isVisible(camera)) {
-                lane.drawBackground(ctx, camera);
-            }
-        }
+        const visibleLanes = [...this.lanes.values()]
+            .filter(lane => lane.isVisible(camera))
+            .reverse(); // de cima (linha maior) para baixo
+
+        for (const lane of visibleLanes) lane.drawBackground(ctx, camera);
+        for (const lane of visibleLanes) lane.drawEntities(ctx, camera);
     }
 }

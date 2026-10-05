@@ -10,6 +10,7 @@ const CONFIG = Object.freeze({
     HEIGHT: 48 * 14,    // altura do canvas (672px)
     MAP_LENGTH: 100,    // número de faixas jogáveis
     SCENERY_ROWS: 8,    // faixas de cenário em cada ponta do mapa  ← NOVO
+    SAFE_START_ROWS: 3,  // faixas iniciais sem obstáculos  ← NOVO
     HOP_DURATION: 0.12, // duração de um pulo, em segundos
     HOP_HEIGHT: 10      // altura do arco do pulo, em pixels
 });
@@ -21,6 +22,11 @@ const Utils = {
     /** Interpolação linear: o valor entre a e b quando t vai de 0 a 1. */
     lerp(a, b, t) {
         return a + (b - a) * t;
+    },
+
+    /** Número inteiro aleatório entre min e max, incluindo os dois. ← NOVO */
+    randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 };
 
@@ -39,6 +45,7 @@ const PALETTE = Object.freeze({
     PELAGEM_SOMBRA: '#A86C3D',
     TRONCO: '#8C5A3C',
     // Neutros
+    ASFALTO_CLARO: '#6B7180', // ← NOVO
     PAPEL: '#FFF8EC',
     TINTA: '#2B2420'
 });
