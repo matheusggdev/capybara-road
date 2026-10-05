@@ -9,7 +9,8 @@ class Game {
         canvas.height = CONFIG.HEIGHT;
 
         this.state = 'menu'; // 'menu' ou 'playing' (mais estados nas próximas etapas)
-
+        this.capybara = null; // ← NOVA LINHA: a capivara é criada em startGame()
+        
         const buttonWidth = 200;
         this.playButton = new Button(
             (CONFIG.WIDTH - buttonWidth) / 2, 380, buttonWidth, 60, 'PLAY'
@@ -21,6 +22,16 @@ class Game {
         this.lastTime = 0;
         this.loop = this.loop.bind(this); // mantém o "this" dentro do loop
         requestAnimationFrame(this.loop);
+    }
+
+    /** Prepara uma nova partida. */
+    startGame() {
+        // começa centralizada na horizontal, perto do rodapé
+        const startCol = Math.floor(CONFIG.COLS / 2);   // coluna 5
+        const startRow = CONFIG.ROWS_VISIBLE - 2;       // linha 12
+        this.capybara = new Capybara(startCol, startRow);
+
+        this.state = 'playing';
     }
 
     /** Converte a posição do mouse na página para a posição no canvas. */
@@ -35,7 +46,7 @@ class Game {
     handleClick(event) {
         const mouse = this.getMousePosition(event);
         if (this.state === 'menu' && this.playButton.contains(mouse.x, mouse.y)) {
-            this.state = 'playing';
+            this.startGame();
             this.canvas.style.cursor = 'default';
         }
     }
@@ -64,7 +75,12 @@ class Game {
 
     draw() {
         this.drawGrass();
-        if (this.state === 'menu') this.drawMenu();
+
+        if (this.state === 'menu') {
+            this.drawMenu();
+        } else if (this.state === 'playing') {
+            this.capybara.draw(this.ctx);
+        }
     }
 
     drawGrass() {
