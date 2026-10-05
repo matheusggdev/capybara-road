@@ -14,7 +14,10 @@ const CONFIG = Object.freeze({
     SCENERY_ROWS: 8,    // faixas de cenário em cada ponta do mapa  ← NOVO
     SAFE_START_ROWS: 3,  // faixas iniciais sem obstáculos  ← NOVO
     HOP_DURATION: 0.12, // duração de um pulo, em segundos
-    HOP_HEIGHT: 10      // altura do arco do pulo, em pixels
+    HOP_HEIGHT: 10,      // altura do arco do pulo, em pixels
+    SAFE_START_ROWS: 3,
+    ROAD_SPEED_MIN: 60,   // velocidade mínima dos veículos (pixels/segundo) ← NOVO
+    ROAD_SPEED_MAX: 140,  // velocidade máxima dos veículos (pixels/segundo) ← NOVO
 });
 
 /**
@@ -29,6 +32,21 @@ const Utils = {
     /** Número inteiro aleatório entre min e max, incluindo os dois. ← NOVO */
     randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+
+    /** Número decimal aleatório entre min e max. */
+    randomFloat(min, max) {
+        return Math.random() * (max - min) + min;
+    },
+
+    /** Devolve 1 ou -1 aleatoriamente (sentido de movimento). */
+    randomSign() {
+        return Math.random() < 0.5 ? -1 : 1;
+    },
+
+    /** Mantém o valor dentro do intervalo [min, max]. */
+    clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
     }
 };
 
@@ -53,4 +71,20 @@ const PALETTE = Object.freeze({
     // Amarelos (interação) ← NOVO
     IPE: '#FFC83D',   // botões
     MANGA: '#FFA62B', // hover de botões
+    // Amarelos (interação)
+    IPE: '#FFC83D',
+    MANGA: '#FFA62B',
+    MILHO: '#FFE066',           // ← NOVO: faróis e brilhos
+    // Azuis
+    RASO: '#8EE3F0',            // ← NOVO: vidros
+    AZULEJO: '#1E5AA8',         // ← NOVO: veículos
+    // Acentos
+    ACEROLA: '#FF6B5B',         // ← NOVO: veículos (perigo)
+    LARANJA_LIMA: '#FF7A2F',    // ← NOVO: veículos
+    // Neutros
+    ASFALTO: '#4A4F5C',         // ← NOVO: ruas
+    ASFALTO_CLARO: '#6B7180',
+    PAPEL: '#FFF8EC',
+    TINTA: '#2B2420',
+    SOMBRA: 'rgba(43, 42, 85, 0.25)' // ← NOVO: sombras no chão (#2B2A55 a 25%)
 });

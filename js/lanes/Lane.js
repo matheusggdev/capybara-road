@@ -82,4 +82,23 @@ class Lane {
         const screenY = camera.toScreenY(this.y);
         return screenY > -CONFIG.TILE && screenY < CONFIG.HEIGHT;
     }
+
+    /**
+     * Faz a entidade "dar a volta": quando sai por um lado,
+     * reaparece do outro. O circuito vai de 2 quadrados antes
+     * da tela até 2 quadrados depois dela.
+     * @param {MovingEntity} entity
+     */
+    wrap(entity) {
+        const T = CONFIG.TILE;
+        const start = -2 * T;
+        const end = CONFIG.WIDTH + 2 * T;
+        const loopLength = end - start;
+
+        if (entity.speed > 0 && entity.x > end) {
+            entity.x -= loopLength;
+        } else if (entity.speed < 0 && entity.x + entity.width < start) {
+            entity.x += loopLength;
+        }
+    }
 }
