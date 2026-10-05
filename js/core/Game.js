@@ -8,10 +8,13 @@ class Game {
         canvas.width = CONFIG.WIDTH;
         canvas.height = CONFIG.HEIGHT;
 
-        this.state = 'menu'; // 'menu' ou 'playing' (mais estados nas próximas etapas)
-        this.capybara = null; // ← NOVA LINHA: a capivara é criada em startGame()
+        this.state = 'menu'; 
+        this.capybara = null; 
         this.input = new InputHandler();
         this.camera = new Camera();
+        this.world = new World();  
+
+        this.camera.y = CONFIG.TILE - CONFIG.HEIGHT;
 
         const buttonWidth = 200;
         this.playButton = new Button(
@@ -28,6 +31,8 @@ class Game {
 
     /** Prepara uma nova partida. */
     startGame() {
+        this.world = new World(); // recria o mapa
+
         // começa centralizada na horizontal, na linha 0 (início do mapa)
         const startCol = Math.floor(CONFIG.COLS / 2);
         this.capybara = new Capybara(startCol, 0);
@@ -74,6 +79,7 @@ class Game {
         if (this.state === 'playing') {
             this.handlePlayerInput();
             this.capybara.update(dt);
+            this.world.update(dt);
             this.camera.follow(this.capybara);
         }
     }
@@ -85,37 +91,22 @@ class Game {
         if (!this.capybara.canMove()) return;
 
         const move = this.input.consumeMove();
-        if (move) this.capybara.hop(move);
+        if (move) this.capybara.hop(move, this.world);
     }
 
     draw() {
-        this.drawGrass();
+        // Limpa a tela com uma cor de fundo. Sem isso, as áreas onde
+        // nenhuma faixa é desenhada guardariam o quadro anterior,
+        // deixando "rastros".
+        this.ctx.fillStyle = '#1f3d1a';
+        this.ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
+
+        this.world.draw(this.ctx, this.camera);
 
         if (this.state === 'menu') {
             this.drawMenu();
         } else if (this.state === 'playing') {
             this.capybara.draw(this.ctx, this.camera);
-        }
-    }
-
-    /**
-     * Pinta a grama listrada nas linhas visíveis.
-     * (provisório: no passo 2 cada faixa se desenha sozinha)
-     */
-    drawGrass() {
-        const T = CONFIG.TILE;
-
-        // Quais linhas do mapa aparecem na tela agora?
-        // Topo da tela: y do mundo = camera.y
-        // Base da tela: y do mundo = camera.y + HEIGHT
-        // Como y = -row * T, então row = -y / T
-        const topRow = Math.ceil(-this.camera.y / T);
-        const bottomRow = Math.floor(-(this.camera.y + CONFIG.HEIGHT) / T);
-
-        for (let row = bottomRow; row <= topRow; row++) {
-            const screenY = this.camera.toScreenY(-row * T);
-            this.ctx.fillStyle = Math.abs(row) % 2 === 0 ? '#86d15a' : '#7bc64e';
-            this.ctx.fillRect(0, screenY, CONFIG.WIDTH, T);
         }
     }
 

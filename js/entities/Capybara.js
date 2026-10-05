@@ -52,12 +52,13 @@ class Capybara extends Entity {
         return !this.isHopping;
     }
 
-    /**
+        /**
      * Tenta pular um quadrado na direção indicada.
      * @param {string} direction 'up', 'down', 'left' ou 'right'
+     * @param {World} world usado para saber se o destino existe e está livre
      * @returns {boolean} true se o pulo começou
      */
-    hop(direction) {
+    hop(direction, world) {
         if (!this.canMove()) return false;
 
         this.direction = direction;
@@ -66,11 +67,12 @@ class Capybara extends Entity {
         const targetCol = this.col + move.col;
         const targetRow = this.row + move.row;
 
-        // MUDOU: limita as colunas e impede voltar antes do início.
-        // (provisório: no passo 3 a cerca assume esse papel)
-        const isOutside =
-            targetCol < 0 || targetCol >= CONFIG.COLS || targetRow < 0;
-        if (isOutside) return false;
+        // Não pode sair pelas laterais
+        if (targetCol < 0 || targetCol >= CONFIG.COLS) return false;
+
+        // Não pode ir para uma faixa que não existe ou para uma coluna bloqueada
+        const lane = world.getLane(targetRow);
+        if (!lane || lane.isBlocked(targetCol)) return false;
 
         this.col = targetCol;
         this.row = targetRow;
