@@ -5,8 +5,11 @@ class Game {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        canvas.width = CONFIG.WIDTH;
-        canvas.height = CONFIG.HEIGHT;
+
+        // Ajusta o tamanho do canvas à janela, agora e sempre que ela mudar
+        this.renderScale = 1; // calculado em fitToWindow()
+        this.fitToWindow();
+        window.addEventListener('resize', () => this.fitToWindow());
 
         this.state = 'menu'; 
         this.capybara = null; 
@@ -29,6 +32,39 @@ class Game {
         requestAnimationFrame(this.loop);
     }
 
+        /**
+     * Ajusta o canvas para ocupar o máximo da janela, mantendo a proporção.
+     *
+     * - O tamanho NA TELA (CSS) cresce até caber na janela.
+     * - O tamanho REAL do canvas acompanha, multiplicado pela densidade
+     *   da tela (devicePixelRatio), para os desenhos ficarem nítidos.
+     * - O jogo continua pensando em 528 × 672; renderScale faz a conversão.
+     */
+        fitToWindow() {
+            const padding = 32; // folga para a borda e a sombra da janela do jogo
+            const maxScale = 2; // evita ficar gigante em monitores enormes
+    
+            const scale = Math.min(
+                (window.innerWidth - padding) / CONFIG.WIDTH,
+                (window.innerHeight - padding) / CONFIG.HEIGHT,
+                maxScale
+            );
+    
+            // tamanho em que o canvas aparece na tela
+            const displayWidth = Math.floor(CONFIG.WIDTH * scale);
+            const displayHeight = Math.floor(CONFIG.HEIGHT * scale);
+            this.canvas.style.width = `${displayWidth}px`;
+            this.canvas.style.height = `${displayHeight}px`;
+    
+            // tamanho real do canvas, considerando a densidade da tela
+            const density = window.devicePixelRatio || 1;
+            this.canvas.width = Math.round(displayWidth * density);
+            this.canvas.height = Math.round(displayHeight * density);
+    
+            // quanto cada pixel lógico vale em pixels reais
+            this.renderScale = this.canvas.width / CONFIG.WIDTH;
+        }
+
     /** Prepara uma nova partida. */
     startGame() {
         this.world = new World(); // recria o mapa
@@ -46,8 +82,8 @@ class Game {
     getMousePosition(event) {
         const rect = this.canvas.getBoundingClientRect();
         return {
-            x: (event.clientX - rect.left) * (this.canvas.width / rect.width),
-            y: (event.clientY - rect.top) * (this.canvas.height / rect.height)
+            x: (event.clientX - rect.left) * (CONFIG.WIDTH / rect.width),
+            y: (event.clientY - rect.top) * (CONFIG.HEIGHT / rect.height)
         };
     }
 
@@ -116,6 +152,13 @@ class Game {
     }
 
     draw() {
+        const ctx = this.ctx;
+
+        // Escala tudo de pixels lógicos (528 × 672) para os pixels reais
+        ctx.setTransform(this.renderScale, 0, 0, this.renderScale, 0, 0);
+
+        ctx.fillStyle = '#1f3d1a';
+        ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
         // Limpa a tela com uma cor de fundo. Sem isso, as áreas onde
         // nenhuma faixa é desenhada guardariam o quadro anterior,
         // deixando "rastros".
