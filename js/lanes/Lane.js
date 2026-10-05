@@ -18,6 +18,17 @@ class Lane {
         this.y = -row * CONFIG.TILE; // posição vertical no mundo
     }
 
+        /**
+     * Chamado a cada quadro enquanto a capivara está parada nesta faixa.
+     * Por padrão não faz nada. Faixas especiais sobrescrevem
+     * (ex.: a linha de chegada declara vitória).
+     * @param {Capybara} player
+     * @param {Game} game
+     */
+    onPlayerInside(player, game) {
+        // vazio de propósito
+    }
+
     /**
      * Atualiza a faixa a cada quadro.
      * Por padrão não faz nada (a grama é parada).

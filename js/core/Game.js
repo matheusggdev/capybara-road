@@ -53,9 +53,12 @@ class Game {
 
     handleClick(event) {
         const mouse = this.getMousePosition(event);
+
         if (this.state === 'menu' && this.playButton.contains(mouse.x, mouse.y)) {
             this.startGame();
             this.canvas.style.cursor = 'default';
+        } else if (this.state === 'victory') {
+            this.state = 'menu';
         }
     }
 
@@ -80,8 +83,26 @@ class Game {
             this.handlePlayerInput();
             this.capybara.update(dt);
             this.world.update(dt);
+            this.checkCurrentLane();
             this.camera.follow(this.capybara);
         }
+    }
+
+    /**
+     * Avisa a faixa onde a capivara está parada.
+     * Cada faixa decide o que acontece (polimorfismo).
+     */
+    checkCurrentLane() {
+        // durante o pulo ela ainda não "chegou" à faixa
+        if (this.capybara.isHopping) return;
+
+        const lane = this.world.getLane(this.capybara.row);
+        if (lane) lane.onPlayerInside(this.capybara, this);
+    }
+
+    /** Chamado pela linha de chegada. */
+    win() {
+        this.state = 'victory';
     }
 
     /** Pega o próximo movimento da fila e tenta pular. */
@@ -107,6 +128,9 @@ class Game {
             this.drawMenu();
         } else if (this.state === 'playing') {
             this.capybara.draw(this.ctx, this.camera);
+        } else if (this.state === 'victory') {
+            this.capybara.draw(this.ctx, this.camera);
+            this.drawVictory();
         }
     }
 
@@ -124,5 +148,21 @@ class Game {
         ctx.fillText('ROAD', centerX, 260);
 
         this.playButton.draw(ctx);
+    }
+
+    /** Tela de vitória provisória (a definitiva vem na etapa 6). */
+    drawVictory() {
+        const ctx = this.ctx;
+        const centerX = CONFIG.WIDTH / 2;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
+
+        ctx.fillStyle = PALETTE.PAPEL;
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 40px sans-serif';
+        ctx.fillText('VOCÊ CHEGOU!', centerX, 300);
+        ctx.font = '18px sans-serif';
+        ctx.fillText('Clique para voltar ao menu', centerX, 350);
     }
 }
