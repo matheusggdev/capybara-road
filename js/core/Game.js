@@ -11,6 +11,7 @@ class Game {
         this.state = 'menu'; // 'menu' ou 'playing' (mais estados nas próximas etapas)
         this.capybara = null; // ← NOVA LINHA: a capivara é criada em startGame()
         this.input = new InputHandler();
+        this.camera = new Camera();
 
         const buttonWidth = 200;
         this.playButton = new Button(
@@ -27,10 +28,10 @@ class Game {
 
     /** Prepara uma nova partida. */
     startGame() {
-        // começa centralizada na horizontal, perto do rodapé
-        const startCol = Math.floor(CONFIG.COLS / 2);   // coluna 5
-        const startRow = CONFIG.ROWS_VISIBLE - 2;       // linha 12
-        this.capybara = new Capybara(startCol, startRow);
+        // começa centralizada na horizontal, na linha 0 (início do mapa)
+        const startCol = Math.floor(CONFIG.COLS / 2);
+        this.capybara = new Capybara(startCol, 0);
+        this.camera.follow(this.capybara);
 
         this.input.clear();
         this.state = 'playing';
@@ -73,6 +74,7 @@ class Game {
         if (this.state === 'playing') {
             this.handlePlayerInput();
             this.capybara.update(dt);
+            this.camera.follow(this.capybara);
         }
     }
 
@@ -92,14 +94,28 @@ class Game {
         if (this.state === 'menu') {
             this.drawMenu();
         } else if (this.state === 'playing') {
-            this.capybara.draw(this.ctx);
+            this.capybara.draw(this.ctx, this.camera);
         }
     }
 
+    /**
+     * Pinta a grama listrada nas linhas visíveis.
+     * (provisório: no passo 2 cada faixa se desenha sozinha)
+     */
     drawGrass() {
-        for (let row = 0; row < CONFIG.ROWS_VISIBLE; row++) {
-            this.ctx.fillStyle = row % 2 === 0 ? '#86d15a' : '#7bc64e';
-            this.ctx.fillRect(0, row * CONFIG.TILE, CONFIG.WIDTH, CONFIG.TILE);
+        const T = CONFIG.TILE;
+
+        // Quais linhas do mapa aparecem na tela agora?
+        // Topo da tela: y do mundo = camera.y
+        // Base da tela: y do mundo = camera.y + HEIGHT
+        // Como y = -row * T, então row = -y / T
+        const topRow = Math.ceil(-this.camera.y / T);
+        const bottomRow = Math.floor(-(this.camera.y + CONFIG.HEIGHT) / T);
+
+        for (let row = bottomRow; row <= topRow; row++) {
+            const screenY = this.camera.toScreenY(-row * T);
+            this.ctx.fillStyle = Math.abs(row) % 2 === 0 ? '#86d15a' : '#7bc64e';
+            this.ctx.fillRect(0, screenY, CONFIG.WIDTH, T);
         }
     }
 

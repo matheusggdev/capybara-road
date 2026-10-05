@@ -4,27 +4,31 @@
  * Herança: Entity -> Capybara
  *
  * Anda pelo grid pulando de quadrado em quadrado.
+ * A linha 0 é o início do mapa, e as linhas crescem para cima.
+ * No mundo, y = -row * TILE.
+ *
  * Por enquanto é desenhada como um quadrado marrom, com um
  * pontinho indicando a direção. O desenho final entra na etapa 7.
  */
 class Capybara extends Entity {
     /**
      * Quanto cada direção muda a coluna e a linha.
-     * (linha 0 = topo da tela, por isso "up" diminui a linha)
+     * MUDOU: "up" agora AUMENTA a linha (o mapa cresce para cima).
      */
     static MOVES = {
-        up:    { col: 0,  row: -1 },
-        down:  { col: 0,  row: 1 },
+        up:    { col: 0,  row: 1 },
+        down:  { col: 0,  row: -1 },
         left:  { col: -1, row: 0 },
         right: { col: 1,  row: 0 }
     };
 
     /**
      * @param {number} col coluna inicial do grid
-     * @param {number} row linha inicial do grid
+     * @param {number} row linha inicial do mapa (0 = início)
      */
     constructor(col, row) {
-        super(col * CONFIG.TILE, row * CONFIG.TILE, CONFIG.TILE, CONFIG.TILE);
+        // MUDOU: y = -row * TILE (linhas crescem para cima)
+        super(col * CONFIG.TILE, -row * CONFIG.TILE, CONFIG.TILE, CONFIG.TILE);
 
         // Posição lógica (em qual quadrado está)
         this.col = col;
@@ -35,12 +39,12 @@ class Capybara extends Entity {
 
         // Estado do pulo
         this.isHopping = false;
-        this.hopTimer = 0;      // quanto tempo do pulo já passou
-        this.startX = this.x;   // de onde o pulo saiu (pixels)
+        this.hopTimer = 0;
+        this.startX = this.x;
         this.startY = this.y;
-        this.targetX = this.x;  // para onde o pulo vai (pixels)
+        this.targetX = this.x;
         this.targetY = this.y;
-        this.jumpHeight = 0;    // altura atual do arco
+        this.jumpHeight = 0;
     }
 
     /** Só pode pular se não estiver no meio de outro pulo. */
@@ -56,29 +60,25 @@ class Capybara extends Entity {
     hop(direction) {
         if (!this.canMove()) return false;
 
-        // Vira para a direção pedida, mesmo que não consiga pular
-        // (dá ao jogador a resposta de que a tecla funcionou)
         this.direction = direction;
 
         const move = Capybara.MOVES[direction];
         const targetCol = this.col + move.col;
         const targetRow = this.row + move.row;
 
-        // Não deixa sair da tela
+        // MUDOU: limita as colunas e impede voltar antes do início.
+        // (provisório: no passo 3 a cerca assume esse papel)
         const isOutside =
-            targetCol < 0 || targetCol >= CONFIG.COLS ||
-            targetRow < 0 || targetRow >= CONFIG.ROWS_VISIBLE;
+            targetCol < 0 || targetCol >= CONFIG.COLS || targetRow < 0;
         if (isOutside) return false;
 
-        // A posição lógica muda na hora...
         this.col = targetCol;
         this.row = targetRow;
 
-        // ...e a visual vai deslizar durante o pulo
         this.startX = this.x;
         this.startY = this.y;
         this.targetX = targetCol * CONFIG.TILE;
-        this.targetY = targetRow * CONFIG.TILE;
+        this.targetY = -targetRow * CONFIG.TILE; // MUDOU: sinal negativo
         this.hopTimer = 0;
         this.isHopping = true;
         return true;
@@ -92,8 +92,6 @@ class Capybara extends Entity {
         if (!this.isHopping) return;
 
         this.hopTimer += dt;
-
-        // t vai de 0 (início) a 1 (fim do pulo)
         const t = Math.min(this.hopTimer / CONFIG.HOP_DURATION, 1);
 
         this.x = Utils.lerp(this.startX, this.targetX, t);
@@ -108,19 +106,22 @@ class Capybara extends Entity {
 
     /**
      * Sobrescreve Entity.draw().
+     * MUDOU: recebe a câmera e converte o y do mundo para a tela.
      * @param {CanvasRenderingContext2D} ctx
+     * @param {Camera} camera
      */
-    draw(ctx) {
+    draw(ctx, camera) {
+        const screenY = camera.toScreenY(this.y);
         const centerX = this.x + this.width / 2;
 
         // sombra: fica no chão enquanto o corpo sobe
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.beginPath();
-        ctx.ellipse(centerX, this.y + this.height - 8, 16, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, screenY + this.height - 8, 16, 5, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // o corpo é desenhado mais alto durante o pulo
-        const bodyY = this.y - this.jumpHeight;
+        const bodyY = screenY - this.jumpHeight;
 
         // corpo provisório: quadrado marrom
         ctx.fillStyle = '#9c6b3c';

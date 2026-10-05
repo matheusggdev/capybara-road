@@ -7,8 +7,8 @@
  */
 class Entity {
     /**
-     * @param {number} x      posição horizontal, em pixels
-     * @param {number} y      posição vertical, em pixels
+     * @param {number} x      posição horizontal no mundo, em pixels
+     * @param {number} y      posição vertical no mundo, em pixels
      * @param {number} width  largura, em pixels
      * @param {number} height altura, em pixels
      */
@@ -39,8 +39,9 @@ class Entity {
      * Desenha a entidade. Método ABSTRATO: toda subclasse
      * é obrigada a implementar o seu próprio desenho.
      * @param {CanvasRenderingContext2D} ctx
+     * @param {Camera} camera converte posições do mundo para a tela
      */
-    draw(ctx) {
+    draw(ctx, camera) {
         throw new Error(`${this.constructor.name} precisa implementar draw().`);
     }
 }
