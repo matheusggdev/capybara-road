@@ -71,8 +71,19 @@ class Game {
 
     update(dt) {
         if (this.state === 'playing') {
-            // a gameplay entra nas próximas etapas
+            this.handlePlayerInput();
+            this.capybara.update(dt);
         }
+    }
+
+    /** Pega o próximo movimento da fila e tenta pular. */
+    handlePlayerInput() {
+        // Só retira da fila quando a capivara pode pular.
+        // Assim, uma tecla apertada no meio do pulo fica guardada.
+        if (!this.capybara.canMove()) return;
+
+        const move = this.input.consumeMove();
+        if (move) this.capybara.hop(move);
     }
 
     draw() {
