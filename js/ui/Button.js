@@ -19,14 +19,14 @@ class Button {
     }
 
     draw(ctx) {
-        ctx.fillStyle = this.isHovered ? '#ffd27a' : '#ffcc66';
+        ctx.fillStyle = this.isHovered ? PALETTE.MANGA : PALETTE.IPE;
         ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.strokeStyle = '#5a3a1c';
+        ctx.strokeStyle = PALETTE.TINTA;
         ctx.lineWidth = 4;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
 
-        ctx.fillStyle = '#5a3a1c';
-        ctx.font = 'bold 24px sans-serif';
+        ctx.fillStyle = PALETTE.TINTA;
+        ctx.font = `800 26px ${CONFIG.FONT_TITLE}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2);

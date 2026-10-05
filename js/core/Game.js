@@ -184,8 +184,8 @@ class Game {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
 
-        ctx.fillStyle = '#ffcc66';
-        ctx.font = 'bold 48px sans-serif';
+        ctx.fillStyle = PALETTE.IPE;
+        ctx.font = `800 56px ${CONFIG.FONT_TITLE}`;
         ctx.textAlign = 'center';
         ctx.fillText('CAPYBARA', centerX, 200);
         ctx.fillText('ROAD', centerX, 260);
@@ -203,9 +203,9 @@ class Game {
 
         ctx.fillStyle = PALETTE.PAPEL;
         ctx.textAlign = 'center';
-        ctx.font = 'bold 40px sans-serif';
+        ctx.font = `800 44px ${CONFIG.FONT_TITLE}`;
         ctx.fillText('VOCÊ CHEGOU!', centerX, 300);
-        ctx.font = '18px sans-serif';
+        ctx.font = `700 18px ${CONFIG.FONT_TEXT}`;
         ctx.fillText('Clique para voltar ao menu', centerX, 350);
     }
 }
