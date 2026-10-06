@@ -126,3 +126,72 @@ class Car extends Vehicle {
         });
     }
 }
+
+/* ------------------------------------------------------------ */
+
+/** Ônibus: longo e lento. 2,5 quadrados de comprimento. */
+class Bus extends Vehicle {
+    /** Cores possíveis: a faixa de baixo do ônibus. */
+    static COLORS = [PALETTE.AZULEJO, PALETTE.ACEROLA, PALETTE.FOLHA];
+
+     /** Chance de a faixa ser de ônibus em vez de carros. */
+     static BUS_CHANCE = 0.25;
+
+     /** Ônibus andam mais devagar: 60% da velocidade de um carro. */
+     static BUS_SPEED_FACTOR = 0.6;
+
+    constructor(x, y, speed) {
+        const color = Bus.COLORS[Utils.randomInt(0, Bus.COLORS.length - 1)];
+        super(x, y, 2.5, speed, color);
+    }
+
+    /**
+     * Sobrescreve Entity.draw(): ônibus visto de lado,
+     * parte de cima clara e faixa colorida embaixo.
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {Camera} camera
+     */
+    draw(ctx, camera) {
+        this.drawFacingDirection(ctx, camera, () => {
+            const w = this.width;
+
+            this.drawShadow(ctx);
+
+            // corpo claro
+            ctx.fillStyle = PALETTE.PAPEL;
+            ctx.beginPath();
+            ctx.roundRect(3, 6, w - 6, 32, 8);
+            ctx.fill();
+
+            // faixa colorida embaixo (só os cantos de baixo arredondados)
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.roundRect(3, 25, w - 6, 13, [0, 0, 8, 8]);
+            ctx.fill();
+
+            // fileira de janelas
+            ctx.fillStyle = PALETTE.RASO;
+            const windowCount = 4;
+            const windowArea = w - 30;
+            const windowWidth = windowArea / windowCount - 4;
+            for (let i = 0; i < windowCount; i++) {
+                ctx.fillRect(12 + i * (windowArea / windowCount), 11, windowWidth, 10);
+            }
+
+            // contorno por último, para ficar por cima de tudo
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = PALETTE.TINTA;
+            ctx.beginPath();
+            ctx.roundRect(3, 6, w - 6, 32, 8);
+            ctx.stroke();
+
+            // farol na frente (à direita)
+            ctx.fillStyle = PALETTE.MILHO;
+            ctx.fillRect(w - 9, 28, 4, 5);
+
+            // rodas
+            this.drawWheel(ctx, w * 0.22, 37, 7);
+            this.drawWheel(ctx, w * 0.78, 37, 7);
+        });
+    }
+}

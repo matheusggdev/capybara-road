@@ -1,7 +1,8 @@
 /**
- * Faixa de estrada com carros.
- * Cada faixa sorteia o seu sentido. Todos os veículos da mesma
- * faixa andam no mesmo sentido e velocidade, para nunca se baterem.
+ * Faixa de estrada com carros ou ônibus.
+ * Cada faixa sorteia o seu sentido e o tipo de veículo. Todos os
+ * veículos da mesma faixa andam no mesmo sentido e velocidade,
+ * para nunca se baterem.
  *
  * Herança: Lane -> RoadLane
  */
@@ -10,6 +11,12 @@ class RoadLane extends Lane {
      * @param {number} row        linha da faixa no mapa
      * @param {number} difficulty multiplicador de velocidade (1 = fácil)
      */
+
+    /** Chance de a faixa ser de ônibus em vez de carros. */
+    static BUS_CHANCE = 0.25;
+
+    /** Ônibus andam mais devagar: 60% da velocidade de um carro. */
+    static BUS_SPEED_FACTOR = 0.6;
     constructor(row, difficulty) {
         super(row);
 
@@ -20,21 +27,29 @@ class RoadLane extends Lane {
         this.createVehicles(difficulty);
     }
 
-    /** Cria de 1 a 3 carros, espaçados igualmente no circuito. */
+    /** Cria os veículos da faixa, espaçados igualmente no circuito. */
     createVehicles(difficulty) {
-        const T = CONFIG.TILE;
-        const speed = Utils.randomSign() *
-            Utils.randomFloat(CONFIG.ROAD_SPEED_MIN, CONFIG.ROAD_SPEED_MAX) * difficulty;
-
-        const count = Utils.randomInt(1, 3);
-        const loopLength = CONFIG.WIDTH + 4 * T; // mesmo circuito do wrap()
-        const spacing = loopLength / count;
-        const offset = Math.random() * spacing;  // posição inicial sorteada
-
-        for (let i = 0; i < count; i++) {
-            const x = -2 * T + offset + i * spacing;
-            this.entities.push(new Car(x, this.y, speed));
-        }
+            const T = CONFIG.TILE;
+            const isBusLane = Math.random() < RoadLane.BUS_CHANCE;
+    
+            let speed = Utils.randomSign() *
+                Utils.randomFloat(CONFIG.ROAD_SPEED_MIN, CONFIG.ROAD_SPEED_MAX) * difficulty;
+            if (isBusLane) speed *= RoadLane.BUS_SPEED_FACTOR;
+    
+            // ônibus são longos: no máximo 2 por faixa
+            const count = isBusLane ? Utils.randomInt(1, 2) : Utils.randomInt(1, 3);
+    
+            const loopLength = CONFIG.WIDTH + 4 * T;
+            const spacing = loopLength / count;
+            const offset = Math.random() * spacing;
+    
+            for (let i = 0; i < count; i++) {
+                const x = -2 * T + offset + i * spacing;
+                const vehicle = isBusLane
+                    ? new Bus(x, this.y, speed)
+                    : new Car(x, this.y, speed);
+                this.entities.push(vehicle);
+            }
     }
 
     /**
