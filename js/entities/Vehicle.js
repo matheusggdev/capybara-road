@@ -51,27 +51,6 @@ class Vehicle extends MovingEntity {
     }
 
     /**
-     * Prepara o pincel para desenhar o veículo SEMPRE virado para
-     * a direita: posiciona no lugar certo e espelha quando ele anda
-     * para a esquerda. Assim cada subclasse desenha só uma versão.
-     *
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {Camera} camera
-     * @param {Function} drawShape função que desenha o veículo, com
-     *        (0, 0) no canto superior esquerdo e a frente à direita
-     */
-    drawFacingDirection(ctx, camera, drawShape) {
-        const screenY = camera.toScreenY(this.y);
-
-        ctx.save();
-        ctx.translate(this.x + this.width / 2, screenY); // vai para o centro do veículo
-        ctx.scale(this.direction, 1);                    // espelha se for para a esquerda
-        ctx.translate(-this.width / 2, 0);               // volta para o canto esquerdo
-        drawShape();
-        ctx.restore();
-    }
-
-    /**
      * Desenha uma roda com calota.
      * Auxiliar usado por todas as subclasses.
      */
