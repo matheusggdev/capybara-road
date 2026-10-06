@@ -16,6 +16,8 @@ class Game {
         this.input = new InputHandler();
         this.camera = new Camera();
         this.world = new World();  
+        this.deathTitle = '';   // ← NOVO: "EITA!" ou "IXI!"
+        this.deathMessage = ''; // ← NOVO: o motivo da derrota
 
         this.camera.y = CONFIG.TILE - CONFIG.HEIGHT;
 
@@ -40,30 +42,30 @@ class Game {
      *   da tela (devicePixelRatio), para os desenhos ficarem nítidos.
      * - O jogo continua pensando em 528 × 672; renderScale faz a conversão.
      */
-        fitToWindow() {
-            const padding = 32; // folga para a borda e a sombra da janela do jogo
-            const maxScale = 2; // evita ficar gigante em monitores enormes
+    fitToWindow() {
+        const padding = 32; // folga para a borda e a sombra da janela do jogo
+        const maxScale = 2; // evita ficar gigante em monitores enormes
     
-            const scale = Math.min(
-                (window.innerWidth - padding) / CONFIG.WIDTH,
-                (window.innerHeight - padding) / CONFIG.HEIGHT,
-                maxScale
-            );
+        const scale = Math.min(
+            (window.innerWidth - padding) / CONFIG.WIDTH,
+            (window.innerHeight - padding) / CONFIG.HEIGHT,
+            maxScale
+        );
     
-            // tamanho em que o canvas aparece na tela
-            const displayWidth = Math.floor(CONFIG.WIDTH * scale);
-            const displayHeight = Math.floor(CONFIG.HEIGHT * scale);
-            this.canvas.style.width = `${displayWidth}px`;
-            this.canvas.style.height = `${displayHeight}px`;
+        // tamanho em que o canvas aparece na tela
+        const displayWidth = Math.floor(CONFIG.WIDTH * scale);
+        const displayHeight = Math.floor(CONFIG.HEIGHT * scale);
+        this.canvas.style.width = `${displayWidth}px`;
+        this.canvas.style.height = `${displayHeight}px`;
     
-            // tamanho real do canvas, considerando a densidade da tela
-            const density = window.devicePixelRatio || 1;
-            this.canvas.width = Math.round(displayWidth * density);
-            this.canvas.height = Math.round(displayHeight * density);
+        // tamanho real do canvas, considerando a densidade da tela
+        const density = window.devicePixelRatio || 1;
+        this.canvas.width = Math.round(displayWidth * density);
+        this.canvas.height = Math.round(displayHeight * density);
     
-            // quanto cada pixel lógico vale em pixels reais
-            this.renderScale = this.canvas.width / CONFIG.WIDTH;
-        }
+        // quanto cada pixel lógico vale em pixels reais
+        this.renderScale = this.canvas.width / CONFIG.WIDTH;
+    }
 
     /** Prepara uma nova partida. */
     startGame() {
@@ -93,7 +95,7 @@ class Game {
         if (this.state === 'menu' && this.playButton.contains(mouse.x, mouse.y)) {
             this.startGame();
             this.canvas.style.cursor = 'default';
-        } else if (this.state === 'victory') {
+        } else if (this.state === 'victory' || this.state === 'gameover') {
             this.state = 'menu';
         }
     }
@@ -119,8 +121,12 @@ class Game {
             this.handlePlayerInput();
             this.capybara.update(dt);
             this.world.update(dt);
+            this.checkCollisions();
             this.checkCurrentLane();
             this.camera.follow(this.capybara);
+        } else if (this.state === 'gameover') {
+            // o trânsito continua passando atrás da tela de derrota
+            this.world.update(dt);
         }
     }
 
@@ -136,9 +142,41 @@ class Game {
         if (lane) lane.onPlayerInside(this.capybara, this);
     }
 
+    /**
+     * Verifica colisões na faixa da capivara e nas vizinhas.
+     * As vizinhas entram porque, no meio de um pulo, a capivara
+     * está entre duas faixas e pode encostar em qualquer uma delas.
+     */
+    checkCollisions() {
+        const row = this.capybara.row;
+        for (let r = row - 1; r <= row + 1; r++) {
+            const lane = this.world.getLane(r);
+            if (lane) lane.checkCollisions(this.capybara, this);
+            if (!this.capybara.alive) return;
+        }
+    }
+
     /** Chamado pela linha de chegada. */
     win() {
         this.state = 'victory';
+    }
+
+    /**
+     * Chamado por quem derrota a capivara (veículos, e depois
+     * jacarés e a onça), com o motivo da derrota.
+     * @param {string} message
+     */
+    gameOver(message) {
+        if (this.state !== 'playing') return; // evita perder duas vezes
+
+        this.capybara.die();
+        this.deathMessage = message;
+
+        // título sorteado, como pede a bíblia visual
+        const titles = ['EITA!', 'IXI!'];
+        this.deathTitle = titles[Utils.randomInt(0, titles.length - 1)];
+
+        this.state = 'gameover';
     }
 
     /** Pega o próximo movimento da fila e tenta pular. */
@@ -154,27 +192,22 @@ class Game {
     draw() {
         const ctx = this.ctx;
 
-        // Escala tudo de pixels lógicos (528 × 672) para os pixels reais
         ctx.setTransform(this.renderScale, 0, 0, this.renderScale, 0, 0);
 
         ctx.fillStyle = '#1f3d1a';
         ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
-        // Limpa a tela com uma cor de fundo. Sem isso, as áreas onde
-        // nenhuma faixa é desenhada guardariam o quadro anterior,
-        // deixando "rastros".
-        this.ctx.fillStyle = '#1f3d1a';
-        this.ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
 
-        this.world.draw(this.ctx, this.camera);
+        this.world.draw(ctx, this.camera);
 
         if (this.state === 'menu') {
             this.drawMenu();
-        } else if (this.state === 'playing') {
-            this.capybara.draw(this.ctx, this.camera);
-        } else if (this.state === 'victory') {
-            this.capybara.draw(this.ctx, this.camera);
-            this.drawVictory();
+            return;
         }
+
+        this.capybara.draw(ctx, this.camera);
+
+        if (this.state === 'victory') this.drawVictory();
+        if (this.state === 'gameover') this.drawGameOver();
     }
 
     drawMenu() {
@@ -207,5 +240,26 @@ class Game {
         ctx.fillText('VOCÊ CHEGOU!', centerX, 300);
         ctx.font = `700 18px ${CONFIG.FONT_TEXT}`;
         ctx.fillText('Clique para voltar ao menu', centerX, 350);
+    }
+
+    /** Tela de derrota provisória (a definitiva vem na etapa 6). */
+    drawGameOver() {
+        const ctx = this.ctx;
+        const centerX = CONFIG.WIDTH / 2;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
+
+        ctx.textAlign = 'center';
+
+        ctx.fillStyle = PALETTE.ACEROLA;
+        ctx.font = `800 64px ${CONFIG.FONT_TITLE}`;
+        ctx.fillText(this.deathTitle, centerX, 290);
+
+        ctx.fillStyle = PALETTE.PAPEL;
+        ctx.font = `700 20px ${CONFIG.FONT_TEXT}`;
+        ctx.fillText(this.deathMessage, centerX, 340);
+        ctx.font = `700 16px ${CONFIG.FONT_TEXT}`;
+        ctx.fillText('Clique para voltar ao menu', centerX, 380);
     }
 }

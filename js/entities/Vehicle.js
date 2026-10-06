@@ -22,6 +22,35 @@ class Vehicle extends MovingEntity {
     }
 
     /**
+     * Sobrescreve Entity.getHitbox(): só a carroceria, sem as
+     * pontas arredondadas nem o espaço vazio acima do veículo.
+     */
+    getHitbox() {
+        return {
+            x: this.x + 6,
+            y: this.y + 12,
+            width: this.width - 12,
+            height: this.height - 20
+        };
+    }
+
+    /**
+     * Sobrescreve Entity.onPlayerCollision(): todo veículo atropela.
+     * @param {Game} game
+     */
+    onPlayerCollision(game) {
+        game.gameOver(this.getDeathMessage());
+    }
+
+    /**
+     * Mensagem mostrada no game over.
+     * As subclasses sobrescrevem com a sua.
+     */
+    getDeathMessage() {
+        return 'Atropelada!';
+    }
+
+    /**
      * Prepara o pincel para desenhar o veículo SEMPRE virado para
      * a direita: posiciona no lugar certo e espelha quando ele anda
      * para a esquerda. Assim cada subclasse desenha só uma versão.
@@ -77,6 +106,11 @@ class Car extends Vehicle {
     constructor(x, y, speed) {
         const color = Car.COLORS[Utils.randomInt(0, Car.COLORS.length - 1)];
         super(x, y, 1.5, speed, color);
+    }
+
+    /** Sobrescreve Vehicle.getDeathMessage(). */
+    getDeathMessage() {
+        return 'Atropelada por um carro!';
     }
 
     /**
@@ -143,6 +177,11 @@ class Bus extends Vehicle {
     constructor(x, y, speed) {
         const color = Bus.COLORS[Utils.randomInt(0, Bus.COLORS.length - 1)];
         super(x, y, 2.5, speed, color);
+    }
+
+    /** Sobrescreve Vehicle.getDeathMessage(). */
+    getDeathMessage() {
+        return 'Atropelada por um ônibus!';
     }
 
     /**

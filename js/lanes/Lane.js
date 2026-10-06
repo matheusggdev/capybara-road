@@ -101,4 +101,20 @@ class Lane {
             entity.x += loopLength;
         }
     }
+
+    /**
+     * Verifica se a capivara encostou em alguma entidade da faixa.
+     * Não há nenhum "if (é carro)": cada entidade decide o que
+     * acontece no seu onPlayerCollision() (polimorfismo).
+     * @param {Capybara} player
+     * @param {Game} game
+     */
+    checkCollisions(player, game) {
+        for (const entity of this.entities) {
+            if (!player.alive) return; // já perdeu: para de verificar
+            if (entity.intersects(player)) {
+                entity.onPlayerCollision(game);
+            }
+        }
+    }
 }

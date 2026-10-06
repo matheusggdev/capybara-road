@@ -37,6 +37,7 @@ class Capybara extends Entity {
         // Para onde está olhando: 'up', 'down', 'left' ou 'right'
         this.direction = 'up';
 
+        this.alive = true; // ← NOVO
         // Estado do pulo
         this.isHopping = false;
         this.hopTimer = 0;
@@ -47,9 +48,9 @@ class Capybara extends Entity {
         this.jumpHeight = 0;
     }
 
-    /** Só pode pular se não estiver no meio de outro pulo. */
+    /** Só pode pular se estiver viva e não estiver no meio de outro pulo. */
     canMove() {
-        return !this.isHopping;
+        return this.alive && !this.isHopping;
     }
 
         /**
@@ -106,6 +107,27 @@ class Capybara extends Entity {
         }
     }
 
+    /** Marca a capivara como derrotada e interrompe o pulo. */
+    die() {
+        this.alive = false;
+        this.isHopping = false;
+        this.jumpHeight = 0;
+    }
+
+    /**
+     * Sobrescreve Entity.getHitbox(): metade do tamanho do desenho,
+     * centralizada. Perdoa os "raspões".
+     */
+    getHitbox() {
+        const margin = this.width / 4; // 12 pixels de cada lado
+        return {
+            x: this.x + margin,
+            y: this.y + margin,
+            width: this.width - margin * 2,
+            height: this.height - margin * 2
+        };
+    }
+
     /**
      * Sobrescreve Entity.draw().
      * MUDOU: recebe a câmera e converte o y do mundo para a tela.
@@ -125,6 +147,17 @@ class Capybara extends Entity {
         // o corpo é desenhado mais alto durante o pulo
         const bodyY = screenY - this.jumpHeight;
 
+        // corpo provisório: quadrado marrom; achatado quando perde
+        const fullHeight = this.height - 12;
+        const bodyHeight = this.alive ? fullHeight : fullHeight * 0.4;
+        const bodyTop = bodyY + 6 + (fullHeight - bodyHeight); // "pés" no chão
+
+        ctx.fillStyle = PALETTE.PELAGEM;
+        ctx.fillRect(this.x + 6, bodyTop, this.width - 12, bodyHeight);
+
+        // derrotada, não mostra a direção
+        if (!this.alive) return;
+        
         // corpo provisório: quadrado marrom
         ctx.fillStyle = '#9c6b3c';
         ctx.fillRect(this.x + 6, bodyY + 6, this.width - 12, this.height - 12);

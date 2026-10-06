@@ -47,6 +47,17 @@ const Utils = {
     /** Mantém o valor dentro do intervalo [min, max]. */
     clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
+    },
+
+        /**
+     * Verifica se dois retângulos {x, y, width, height} se sobrepõem.
+     * Eles se tocam quando se cruzam na horizontal E na vertical.
+     */
+    rectsOverlap(a, b) {
+            return a.x < b.x + b.width &&
+                   a.x + a.width > b.x &&
+                   a.y < b.y + b.height &&
+                   a.y + a.height > b.y;
     }
 };
 
