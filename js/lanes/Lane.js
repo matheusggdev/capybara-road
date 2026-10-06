@@ -19,6 +19,14 @@ class Lane {
         this.entities = []; // ← NOVO: entidades desta faixa (árvores, carros...)
     }
 
+    /**
+     * A faixa é de água? Por padrão, não.
+     * (Só a RiverLane sobrescreve para responder true.)
+     */
+    get isWater() {
+        return false;
+    }
+
         /**
      * Chamado a cada quadro enquanto a capivara está parada nesta faixa.
      * Por padrão não faz nada. Faixas especiais sobrescrevem

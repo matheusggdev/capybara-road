@@ -131,15 +131,20 @@ class Game {
     }
 
     /**
-     * Avisa a faixa onde a capivara está parada.
+     * Avisa a faixa onde a capivara está e atualiza o nado.
      * Cada faixa decide o que acontece (polimorfismo).
      */
     checkCurrentLane() {
+        const lane = this.world.getLane(this.capybara.row);
+        if (!lane) return;
+
+        // nada sempre que a faixa for de água (inclusive durante a braçada)
+        this.capybara.isSwimming = lane.isWater;
+
         // durante o pulo ela ainda não "chegou" à faixa
         if (this.capybara.isHopping) return;
 
-        const lane = this.world.getLane(this.capybara.row);
-        if (lane) lane.onPlayerInside(this.capybara, this);
+        lane.onPlayerInside(this.capybara, this);
     }
 
     /**

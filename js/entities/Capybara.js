@@ -38,6 +38,9 @@ class Capybara extends Entity {
         this.direction = 'up';
 
         this.alive = true; // ← NOVO
+        this.isSwimming = false; // ← NOVO: definido pelo Game a cada quadro
+        this.animTime = 0;       // ← NOVO: relógio das animações
+        
         // Estado do pulo
         this.isHopping = false;
         this.hopTimer = 0;
@@ -46,6 +49,7 @@ class Capybara extends Entity {
         this.targetX = this.x;
         this.targetY = this.y;
         this.jumpHeight = 0;
+
     }
 
     /** Só pode pular se estiver viva e não estiver no meio de outro pulo. */
@@ -92,6 +96,8 @@ class Capybara extends Entity {
      * @param {number} dt tempo desde o último quadro, em segundos
      */
     update(dt) {
+        this.animTime += dt; // anda sempre, mesmo parada
+
         if (!this.isHopping) return;
 
         this.hopTimer += dt;
@@ -99,7 +105,10 @@ class Capybara extends Entity {
 
         this.x = Utils.lerp(this.startX, this.targetX, t);
         this.y = Utils.lerp(this.startY, this.targetY, t);
-        this.jumpHeight = Math.sin(t * Math.PI) * CONFIG.HOP_HEIGHT;
+
+        // na água o pulo vira uma "braçada" baixinha
+        const hopHeight = this.isSwimming ? CONFIG.HOP_HEIGHT * 0.3 : CONFIG.HOP_HEIGHT;
+        this.jumpHeight = Math.sin(t * Math.PI) * hopHeight;
 
         if (t >= 1) {
             this.isHopping = false;
@@ -138,14 +147,23 @@ class Capybara extends Entity {
         const screenY = camera.toScreenY(this.y);
         const centerX = this.x + this.width / 2;
 
-        // sombra: fica no chão enquanto o corpo sobe
+        // sombra: fica no chão enquanto o corpo sobe (não aparece na água)
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.beginPath();
         ctx.ellipse(centerX, screenY + this.height - 8, 16, 5, 0, 0, Math.PI * 2);
         ctx.fill();
+        if (!this.isSwimming) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(centerX, screenY + this.height - 8, 16, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
 
         // o corpo é desenhado mais alto durante o pulo
-        const bodyY = screenY - this.jumpHeight;
+        // e balança de leve quando está nadando
+        const bob = this.isSwimming ? Math.sin(this.animTime * 4) * 1.5 : 0
+        const bodyY = screenY - this.jumpHeight + bob;
 
         // corpo provisório: quadrado marrom; achatado quando perde
         const fullHeight = this.height - 12;
@@ -154,6 +172,19 @@ class Capybara extends Entity {
 
         ctx.fillStyle = PALETTE.PELAGEM;
         ctx.fillRect(this.x + 6, bodyTop, this.width - 12, bodyHeight);
+
+        // água cobrindo a parte de baixo do corpo
+        if (this.isSwimming) {
+            ctx.fillStyle = PALETTE.RIO;
+            ctx.fillRect(this.x + 2, screenY + this.height * 0.6, this.width - 4, this.height * 0.3);
+
+            // marola em volta
+            ctx.strokeStyle = PALETTE.RASO;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(centerX, screenY + this.height * 0.6, this.width * 0.42, 4, 0, 0, Math.PI);
+            ctx.stroke();
+        }
 
         // derrotada, não mostra a direção
         if (!this.alive) return;

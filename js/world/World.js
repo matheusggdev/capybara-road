@@ -8,7 +8,15 @@ class World {
     /** Quantas faixas seguidas de cada tipo: [mínimo, máximo]. */
     static STREAKS = {
         grass: [1, 3],
-        road: [1, 4]
+        road: [1, 4],
+        river: [3, 6]
+    };
+
+    /** Chance relativa de cada tipo ser sorteado. */
+    static WEIGHTS = {
+        grass: 35,
+        road: 40,
+        river: 25
     };
 
     constructor() {
@@ -48,7 +56,13 @@ class World {
             if (lane instanceof RoadLane && previousLane instanceof RoadLane) {
                 lane.hasDivider = true;
             }
-
+            // margens: onde o rio começa e onde termina   ← NOVO
+            if (lane instanceof RiverLane && !(previousLane instanceof RiverLane)) {
+                lane.hasBankBelow = true;
+            }
+            if (previousLane instanceof RiverLane && !(lane instanceof RiverLane)) {
+                previousLane.hasBankAbove = true;
+            }
             this.addLane(lane);
             previousLane = lane;
         }
@@ -81,12 +95,28 @@ class World {
             this.moveSafeCol();
             return new RoadLane(row, this.getDifficulty(row));
         }
+
+        if (this.currentType === 'river') {                         // ← NOVO
+            this.moveSafeCol(); // na água ela também anda para os lados
+            const previous = this.getLane(row - 1);
+            const direction = previous instanceof RiverLane
+                ? -previous.direction       // alterna o sentido dentro do bloco
+                : Utils.randomSign();       // primeiro rio do bloco: sorteia
+            return new RiverLane(row, this.getDifficulty(row), direction);
+        }
+
+
         return new GrassLane(row, this.safeCol);
     }
 
-    /** Alterna o tipo de faixa e sorteia o tamanho da nova sequência. */
+    /** Sorteia o próximo tipo de faixa (diferente do atual) e quantas repetir. */
     startNewStreak() {
-        this.currentType = this.currentType === 'grass' ? 'road' : 'grass';
+        const options = Object.keys(World.WEIGHTS)
+            .filter(type => type !== this.currentType)
+            .map(type => ({ value: type, weight: World.WEIGHTS[type] }));
+
+        this.currentType = Utils.weightedChoice(options);
+
         const [min, max] = World.STREAKS[this.currentType];
         this.streakRemaining = Utils.randomInt(min, max);
     }

@@ -18,6 +18,8 @@ const CONFIG = Object.freeze({
     SAFE_START_ROWS: 3,
     ROAD_SPEED_MIN: 60,   // velocidade mínima dos veículos (pixels/segundo) ← NOVO
     ROAD_SPEED_MAX: 140,  // velocidade máxima dos veículos (pixels/segundo) ← NOVO
+    RIVER_SPEED_MIN: 40,  // velocidade mínima dos jacarés (pixels/segundo) ← NOVO
+    RIVER_SPEED_MAX: 90,  // velocidade máxima dos jacarés (pixels/segundo) ← NOVO
 });
 
 /**
@@ -58,6 +60,22 @@ const Utils = {
                    a.x + a.width > b.x &&
                    a.y < b.y + b.height &&
                    a.y + a.height > b.y;
+    },
+
+    /**
+     * Sorteia um valor de uma lista, respeitando os pesos.
+     * Ex.: [{ value: 'a', weight: 3 }, { value: 'b', weight: 1 }]
+     * devolve 'a' em ~75% das vezes e 'b' em ~25%.
+     */
+    weightedChoice(options) {
+        const total = options.reduce((sum, option) => sum + option.weight, 0);
+        let roll = Math.random() * total;
+
+        for (const option of options) {
+            roll -= option.weight;
+            if (roll <= 0) return option.value;
+        }
+        return options[options.length - 1].value;
     }
 };
 
@@ -71,6 +89,7 @@ const PALETTE = Object.freeze({
     FOLHA: '#2E9B5E',
     BROTO: '#6CC86A',
     CAPIM_LIMAO: '#A8E06B',
+    VERDE_AGUA: '#3FB8A0',
     // Terra e capivara
     PELAGEM: '#C98B55',
     PELAGEM_SOMBRA: '#A86C3D',
@@ -87,6 +106,7 @@ const PALETTE = Object.freeze({
     MANGA: '#FFA62B',
     MILHO: '#FFE066',           // ← NOVO: faróis e brilhos
     // Azuis
+    RIO: '#2D8FD5',
     RASO: '#8EE3F0',            // ← NOVO: vidros
     AZULEJO: '#1E5AA8',         // ← NOVO: veículos
     // Acentos
