@@ -9,14 +9,16 @@ class World {
     static STREAKS = {
         grass: [1, 3],
         road: [1, 4],
-        river: [3, 6]
+        river: [3, 6],
+        rail: [1, 2]  
     };
 
     /** Chance relativa de cada tipo ser sorteado. */
     static WEIGHTS = {
         grass: 35,
         road: 40,
-        river: 25
+        river: 25,
+        rail: 15
     };
 
     constructor() {
@@ -105,6 +107,10 @@ class World {
             return new RiverLane(row, this.getDifficulty(row), direction);
         }
 
+        if (this.currentType === 'rail') {        // ← NOVO
+            this.moveSafeCol(); // no trilho também dá para andar para os lados
+            return new RailLane(row, this.getDifficulty(row));
+        }
 
         return new GrassLane(row, this.safeCol);
     }

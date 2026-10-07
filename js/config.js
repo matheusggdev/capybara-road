@@ -20,6 +20,10 @@ const CONFIG = Object.freeze({
     ROAD_SPEED_MAX: 140,  // velocidade máxima dos veículos (pixels/segundo) ← NOVO
     RIVER_SPEED_MIN: 40,  // velocidade mínima dos jacarés (pixels/segundo) ← NOVO
     RIVER_SPEED_MAX: 90,  // velocidade máxima dos jacarés (pixels/segundo) ← NOVO
+    TRAIN_SPEED_MIN: 700,   // velocidade mínima do trem (pixels/segundo) ← NOVO
+    TRAIN_SPEED_MAX: 900,   // velocidade máxima do trem (pixels/segundo) ← NOVO
+    RAIL_INTERVAL_MIN: 3,   // tempo mínimo entre trens (segundos)       ← NOVO
+    RAIL_INTERVAL_MAX: 6,   // tempo máximo entre trens (segundos)       ← NOVO
 });
 
 /**
@@ -101,11 +105,10 @@ const PALETTE = Object.freeze({
     // Amarelos (interação) ← NOVO
     IPE: '#FFC83D',   // botões
     MANGA: '#FFA62B', // hover de botões
-    // Amarelos (interação)
-    IPE: '#FFC83D',
-    MANGA: '#FFA62B',
     MILHO: '#FFE066',           // ← NOVO: faróis e brilhos
+    AREIA: '#FBE3A1',      // ← NOVO: chão do trilho
     // Azuis
+    CEU: '#5EC8F2',        // ← NOVO: luz do sinal
     RIO: '#2D8FD5',
     RASO: '#8EE3F0',            // ← NOVO: vidros
     AZULEJO: '#1E5AA8',         // ← NOVO: veículos

@@ -213,3 +213,80 @@ class Bus extends Vehicle {
         });
     }
 }
+
+/* ------------------------------------------------------------ */
+
+/**
+ * Trem: muito longo e muito rápido. Só aparece nos trilhos,
+ * e quem decide quando ele passa é a RailLane.
+ */
+class Train extends Vehicle {
+    /**
+     * @param {number} lengthInTiles comprimento em quadrados (um vagão a cada 2)
+     */
+    constructor(x, y, lengthInTiles, speed) {
+        super(x, y, lengthInTiles, speed, PALETTE.ACEROLA);
+        this.wagonCount = Math.floor(lengthInTiles / 2);
+    }
+
+    /** Sobrescreve Vehicle.getDeathMessage(). */
+    getDeathMessage() {
+        return 'Atropelada pelo trem!';
+    }
+
+    /**
+     * Sobrescreve Entity.draw(): composição de vagões vista de lado,
+     * com a frente arredondada.
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {Camera} camera
+     */
+    draw(ctx, camera) {
+        this.drawFacingDirection(ctx, camera, () => {
+            const wagonWidth = this.width / this.wagonCount;
+
+            this.drawShadow(ctx);
+
+            for (let i = 0; i < this.wagonCount; i++) {
+                const wx = i * wagonWidth + 2;    // início do vagão
+                const ww = wagonWidth - 4;        // largura (sobra um vão entre vagões)
+                const isFront = i === this.wagonCount - 1;
+
+                // engate entre este vagão e o anterior
+                if (i > 0) {
+                    ctx.fillStyle = PALETTE.TINTA;
+                    ctx.fillRect(wx - 5, 24, 6, 6);
+                }
+
+                // corpo (a frente é mais arredondada)
+                ctx.fillStyle = this.color;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = PALETTE.TINTA;
+                ctx.beginPath();
+                ctx.roundRect(wx, 8, ww, 30, isFront ? [6, 18, 18, 6] : 6);
+                ctx.fill();
+                ctx.stroke();
+
+                // faixa clara
+                ctx.fillStyle = PALETTE.PAPEL;
+                ctx.fillRect(wx + 4, 28, ww - 8, 4);
+
+                // três janelas por vagão
+                ctx.fillStyle = PALETTE.RASO;
+                const windowSlot = (ww - 20) / 3;
+                for (let k = 0; k < 3; k++) {
+                    ctx.beginPath();
+                    ctx.roundRect(wx + 10 + k * windowSlot, 13, windowSlot - 6, 10, 3);
+                    ctx.fill();
+                }
+
+                // rodas
+                this.drawWheel(ctx, wx + ww * 0.2, 39, 5);
+                this.drawWheel(ctx, wx + ww * 0.8, 39, 5);
+            }
+
+            // farol na frente
+            ctx.fillStyle = PALETTE.MILHO;
+            ctx.fillRect(this.width - 10, 24, 5, 6);
+        });
+    }
+}
