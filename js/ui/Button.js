@@ -1,15 +1,30 @@
 /**
  * Botão desenhado dentro do canvas.
- * Sabe se desenhar e dizer se um clique caiu dentro dele.
+ * Sabe se desenhar, dizer se um ponto está dentro dele
+ * e executar a sua ação quando clicado.
  */
 class Button {
-    constructor(x, y, width, height, text) {
+    /**
+     * @param {number}   x       posição horizontal, em pixels lógicos
+     * @param {number}   y       posição vertical, em pixels lógicos
+     * @param {number}   width   largura
+     * @param {number}   height  altura
+     * @param {string}   text    texto do botão
+     * @param {Function} onClick ação executada quando o botão é clicado
+     */
+    constructor(x, y, width, height, text, onClick) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.text = text;
-        this.isHovered = false;
+        this.onClick = onClick;
+        this.isHovered = false; // mouse está em cima?
+    }
+
+    /** Executa a ação do botão. */
+    click() {
+        this.onClick();
     }
 
     /** Retorna true se o ponto (px, py) está dentro do botão. */
@@ -18,6 +33,11 @@ class Button {
                py >= this.y && py <= this.y + this.height;
     }
 
+    /**
+     * Desenha o botão com as cores da bíblia visual:
+     * Ipê no normal, Manga no hover, contorno e texto em Tinta.
+     * @param {CanvasRenderingContext2D} ctx
+     */
     draw(ctx) {
         ctx.fillStyle = this.isHovered ? PALETTE.MANGA : PALETTE.IPE;
         ctx.fillRect(this.x, this.y, this.width, this.height);

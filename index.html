@@ -4,37 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Capybara Road</title>
+
     <!-- Fontes da bíblia visual: Baloo 2 e Nunito (Google Fonts, SIL Open Font License) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <canvas id="game"></canvas>
 
+    <!--
+        Ordem importa: cada arquivo precisa vir DEPOIS dos que ele usa.
+        Classes-mãe sempre antes das filhas (por causa do "extends").
+    -->
+
+    <!-- Configurações e utilitários -->
     <script src="js/config.js"></script>
+
+    <!-- Entidades -->
     <script src="js/entities/Entity.js"></script>
     <script src="js/entities/Capybara.js"></script>
     <script src="js/entities/Obstacle.js"></script>
     <script src="js/entities/MovingEntity.js"></script>
     <script src="js/entities/Vehicle.js"></script>
     <script src="js/entities/Alligator.js"></script>
+
+    <!-- Faixas do mapa -->
     <script src="js/lanes/Lane.js"></script>
     <script src="js/lanes/GrassLane.js"></script>
     <script src="js/lanes/RoadLane.js"></script>
     <script src="js/lanes/RiverLane.js"></script>
+    <script src="js/lanes/RailLane.js"></script>
     <script src="js/lanes/SceneryLane.js"></script>
     <script src="js/lanes/BoundaryLane.js"></script>
     <script src="js/lanes/FinishLane.js"></script>
-    <script src="js/lanes/RiverLane.js"></script>
-    <script src="js/lanes/RailLane.js"></script>
+
+    <!-- Mapa -->
     <script src="js/world/World.js"></script>
+
+    <!-- Interface -->
     <script src="js/ui/Button.js"></script>
+
+    <!-- Telas -->
+    <script src="js/screens/Screen.js"></script>
+    <script src="js/screens/MenuScreen.js"></script>
+    <script src="js/screens/PlayScreen.js"></script>
+    <script src="js/screens/GameOverScreen.js"></script>
+    <script src="js/screens/VictoryScreen.js"></script>
+
+    <!-- Motor do jogo -->
     <script src="js/core/InputHandler.js"></script>
     <script src="js/core/Camera.js"></script>
     <script src="js/core/Game.js"></script>
+
+    <!-- Ponto de partida -->
     <script src="js/main.js"></script>
 </body>
 </html>
