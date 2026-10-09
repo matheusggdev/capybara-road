@@ -23,6 +23,7 @@ class Game {
         this.screens = {
             menu: new MenuScreen(this),
             play: new PlayScreen(this),
+            pause: new PauseScreen(this),       // ← NOVO
             gameover: new GameOverScreen(this),
             victory: new VictoryScreen(this)
         };
@@ -31,6 +32,9 @@ class Game {
 
         canvas.addEventListener('click', (event) => this.handleClick(event));
         canvas.addEventListener('mousemove', (event) => this.handleMouseMove(event));
+
+        // NOVO: trocou de aba ou de janela no meio da partida? Pausa sozinho.
+        window.addEventListener('blur', () => this.pause());
 
         this.lastTime = 0;
         this.loop = this.loop.bind(this); // mantém o "this" dentro do loop
@@ -67,7 +71,7 @@ class Game {
 
     /**
      * Troca a tela atual.
-     * @param {string} name 'menu', 'play', 'gameover' ou 'victory'
+     * @param {string} name 'menu', 'play', 'pause', 'gameover' ou 'victory'
      */
     changeScreen(name) {
         this.currentScreen = this.screens[name];
@@ -91,6 +95,19 @@ class Game {
         this.capybara = new Capybara(startCol, 0);
         this.camera.follow(this.capybara);
 
+        this.input.clear();
+        this.changeScreen('play');
+    }
+
+    /** NOVO: pausa a partida (só faz sentido durante o jogo). */
+    pause() {
+        if (this.currentScreen !== this.screens.play) return;
+        this.changeScreen('pause');
+    }
+
+    /** NOVO: volta à partida exatamente de onde parou. */
+    resume() {
+        // descarta teclas apertadas durante o pause
         this.input.clear();
         this.changeScreen('play');
     }

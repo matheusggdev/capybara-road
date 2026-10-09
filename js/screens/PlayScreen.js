@@ -1,12 +1,31 @@
 /**
  * Tela de jogo: toda a lógica da partida acontece aqui.
+ * O único elemento de interface é o botão de pause.
  *
  * Herança: Screen -> PlayScreen
  */
 class PlayScreen extends Screen {
+    constructor(game) {
+        super(game);
+
+        // botão redondo no canto superior direito
+        const size = 48;
+        const margin = 16;
+        this.buttons.push(new IconButton(
+            CONFIG.WIDTH - margin - size, margin, size, 'pause',
+            () => this.game.pause()
+        ));
+    }
+
     /** Sobrescreve Screen.update(): um quadro de gameplay. */
     update(dt) {
         const game = this.game;
+
+        // P ou Esc: pausa e não processa mais nada neste quadro
+        if (game.input.consumePause()) {
+            game.pause();
+            return;
+        }
 
         this.handlePlayerInput();
         game.capybara.update(dt);
@@ -59,8 +78,9 @@ class PlayScreen extends Screen {
         lane.onPlayerInside(capybara, this.game);
     }
 
-    /** Sobrescreve Screen.draw(): só a capivara (o mapa o Game já desenhou). */
+    /** Sobrescreve Screen.draw(): a capivara e o botão de pause. */
     draw(ctx) {
         this.game.capybara.draw(ctx, this.game.camera);
+        this.drawButtons(ctx);
     }
 }
