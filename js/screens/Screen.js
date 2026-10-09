@@ -74,6 +74,16 @@ class Screen {
         }
     }
 
+    /**
+     * Desenha os personagens: primeiro a onça (que vem por trás),
+     * depois a capivara, por cima dela.
+     */
+    drawCharacters(ctx) {
+        const { jaguar, capybara, camera } = this.game;
+        if (jaguar) jaguar.draw(ctx, camera);
+        if (capybara) capybara.draw(ctx, camera);
+    }
+
     /** Escurece o fundo, para destacar textos e botões. */
     drawOverlay(ctx, alpha = 0.4) {
         ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;

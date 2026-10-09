@@ -17,6 +17,7 @@ class Game {
         this.camera = new Camera();
         this.world = new World();
         this.capybara = null;   // criada em startGame()
+        this.jaguar = null;     // ← NOVO: criada em startGame()
         this.deathMessage = ''; // motivo da última derrota
 
         // Telas (padrão State): cada uma é um objeto com o seu comportamento
@@ -83,6 +84,7 @@ class Game {
     goToMenu() {
         this.world = new World();
         this.capybara = null;
+        this.jaguar = null; // ← NOVO
         this.camera.y = CONFIG.TILE - CONFIG.HEIGHT; // mostra o início do mapa
         this.changeScreen('menu');
     }
@@ -93,6 +95,10 @@ class Game {
 
         const startCol = Math.floor(CONFIG.COLS / 2);
         this.capybara = new Capybara(startCol, 0);
+
+        // NOVO: a onça corre na coluna central, a partir da mata atrás da cerca
+        this.jaguar = new Jaguar(startCol, CONFIG.JAGUAR_START_ROW, this.capybara);
+
         this.camera.follow(this.capybara);
 
         this.input.clear();

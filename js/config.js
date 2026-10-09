@@ -24,6 +24,10 @@ const CONFIG = Object.freeze({
     TRAIN_SPEED_MAX: 900,   // velocidade máxima do trem (pixels/segundo) ← NOVO
     RAIL_INTERVAL_MIN: 3,   // tempo mínimo entre trens (segundos)       ← NOVO
     RAIL_INTERVAL_MAX: 6,   // tempo máximo entre trens (segundos)       ← NOVO
+    JAGUAR_SPEED: 0.5,          // faixas por segundo (1 faixa a cada 2 s)   ← NOVO
+    JAGUAR_START_ROW: -4,       // começa escondida na mata, atrás da cerca  ← NOVO
+    JAGUAR_START_DELAY: 3,      // segundos parada antes de começar a correr ← NOVO
+    JAGUAR_CATCH_DURATION: 0.35 // segundos para deslizar até a capivara    ← NOVO
 });
 
 /**

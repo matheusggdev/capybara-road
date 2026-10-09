@@ -19,7 +19,7 @@ class VictoryScreen extends Screen {
 
     /** Sobrescreve Screen.draw(). */
     draw(ctx) {
-        this.game.capybara.draw(ctx, this.game.camera);
+        this.drawCharacters(ctx);
         this.drawOverlay(ctx);
 
         this.drawCenteredText(ctx, 'VOCÊ CHEGOU!', 320, `800 44px ${CONFIG.FONT_TITLE}`, PALETTE.IPE);

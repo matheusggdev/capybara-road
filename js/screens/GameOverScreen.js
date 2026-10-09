@@ -29,7 +29,7 @@ class GameOverScreen extends Screen {
 
     /** Sobrescreve Screen.draw(). */
     draw(ctx) {
-        this.game.capybara.draw(ctx, this.game.camera);
+        this.drawCharacters(ctx);
         this.drawOverlay(ctx);
 
         this.drawCenteredText(ctx, this.title, 290, `800 64px ${CONFIG.FONT_TITLE}`, PALETTE.ACEROLA);

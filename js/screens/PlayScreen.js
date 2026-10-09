@@ -30,6 +30,14 @@ class PlayScreen extends Screen {
         this.handlePlayerInput();
         game.capybara.update(dt);
         game.world.update(dt);
+
+        // NOVO: a onça avança; se pegou, acabou
+        game.jaguar.update(dt);
+        if (game.jaguar.hasCaughtTarget) {
+            game.jaguar.onPlayerCollision(game);
+            return;
+        }
+
         this.checkCollisions();
         this.checkCurrentLane();
         game.camera.follow(game.capybara);
@@ -42,6 +50,9 @@ class PlayScreen extends Screen {
         // Só retira da fila quando a capivara pode pular.
         // Assim, uma tecla apertada no meio do pulo fica guardada.
         if (!capybara.canMove()) return;
+
+        // NOVO: durante o bote da onça, o jogador perde o controle
+        if (this.game.jaguar.isCatching) return;
 
         const move = this.game.input.consumeMove();
         if (move) capybara.hop(move, this.game.world);
@@ -78,9 +89,9 @@ class PlayScreen extends Screen {
         lane.onPlayerInside(capybara, this.game);
     }
 
-    /** Sobrescreve Screen.draw(): a capivara e o botão de pause. */
+    /** Sobrescreve Screen.draw(): os personagens e o botão de pause. */
     draw(ctx) {
-        this.game.capybara.draw(ctx, this.game.camera);
+        this.drawCharacters(ctx); // NOVO: onça + capivara
         this.drawButtons(ctx);
     }
 }

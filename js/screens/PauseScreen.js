@@ -25,7 +25,7 @@ class PauseScreen extends Screen {
 
     /** Sobrescreve Screen.draw(). */
     draw(ctx) {
-        this.game.capybara.draw(ctx, this.game.camera);
+        this.drawCharacters(ctx);
         this.drawOverlay(ctx, 0.5);
 
         this.drawCenteredText(ctx, 'PAUSADO', 290, `800 56px ${CONFIG.FONT_TITLE}`, PALETTE.PAPEL);
