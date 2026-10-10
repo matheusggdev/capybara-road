@@ -126,11 +126,14 @@ const PALETTE = Object.freeze({
     // Terra e capivara
     PELAGEM: '#C98B55',
     PELAGEM_SOMBRA: '#A86C3D',
+    BARRIGA: '#E2B582',
+    FOCINHO: '#7A4E35',
     TRONCO: '#8C5A3C',
 
     // Acentos
     ACEROLA: '#FF6B5B',
     LARANJA_LIMA: '#FF7A2F',
+    JAMBO: '#F49AA0',
 
     // Neutros
     ASFALTO: '#4A4F5C',
