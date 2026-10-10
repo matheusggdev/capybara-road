@@ -17,7 +17,7 @@ body {
 
 /* A "janela" do jogo, como no Crossy Road.
    O tamanho na tela é definido pelo JavaScript (fitToWindow). */
-   #game {
+#game {
     display: block;
     border: 4px solid #5a3a1c;
     border-radius: 16px;

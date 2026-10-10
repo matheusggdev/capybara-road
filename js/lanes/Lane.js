@@ -16,7 +16,7 @@ class Lane {
 
         this.row = row;
         this.y = -row * CONFIG.TILE; // posição vertical no mundo
-        this.entities = []; // ← NOVO: entidades desta faixa (árvores, carros...)
+        this.entities = []; // entidades desta faixa (árvores, carros...)
     }
 
     /**

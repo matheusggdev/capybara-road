@@ -37,9 +37,9 @@ class Capybara extends Entity {
         // Para onde está olhando: 'up', 'down', 'left' ou 'right'
         this.direction = 'up';
 
-        this.alive = true; // ← NOVO
-        this.isSwimming = false; // ← NOVO: definido pelo Game a cada quadro
-        this.animTime = 0;       // ← NOVO: relógio das animações
+        this.alive = true;
+        this.isSwimming = false; // definido pelo Game a cada quadro
+        this.animTime = 0;       // relógio das animações
         
         // Estado do pulo
         this.isHopping = false;

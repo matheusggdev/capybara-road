@@ -29,11 +29,11 @@ class PlayScreen extends Screen {
 
         this.handlePlayerInput();
         game.capybara.update(dt);
-        game.score.update(dt);                  // ← NOVO: cronômetro
-        game.score.registerRow(game.capybara.row); // ← NOVO: faixa mais alta
+        game.score.update(dt);                  // cronômetro
+        game.score.registerRow(game.capybara.row); // faixa mais alta
         game.world.update(dt);
 
-        // NOVO: a onça avança; se pegou, acabou
+        // a onça avança; se pegou, acabou
         game.jaguar.update(dt);
         if (game.jaguar.hasCaughtTarget) {
             game.jaguar.onPlayerCollision(game);
@@ -53,7 +53,7 @@ class PlayScreen extends Screen {
         // Assim, uma tecla apertada no meio do pulo fica guardada.
         if (!capybara.canMove()) return;
 
-        // NOVO: durante o bote da onça, o jogador perde o controle
+        // durante o bote da onça, o jogador perde o controle
         if (this.game.jaguar.isCatching) return;
 
         const move = this.game.input.consumeMove();
@@ -93,7 +93,7 @@ class PlayScreen extends Screen {
 
     /** Sobrescreve Screen.draw(): os personagens e o botão de pause. */
     draw(ctx) {
-        this.drawCharacters(ctx); // NOVO: onça + capivara
+        this.drawCharacters(ctx); // onça + capivara
         this.drawButtons(ctx);
     }
 }

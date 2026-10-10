@@ -58,7 +58,7 @@ class World {
             if (lane instanceof RoadLane && previousLane instanceof RoadLane) {
                 lane.hasDivider = true;
             }
-            // margens: onde o rio começa e onde termina   ← NOVO
+            // margens: onde o rio começa e onde termina
             if (lane instanceof RiverLane && !(previousLane instanceof RiverLane)) {
                 lane.hasBankBelow = true;
             }
@@ -98,7 +98,7 @@ class World {
             return new RoadLane(row, this.getDifficulty(row));
         }
 
-        if (this.currentType === 'river') {                         // ← NOVO
+        if (this.currentType === 'river') {
             this.moveSafeCol(); // na água ela também anda para os lados
             const previous = this.getLane(row - 1);
             const direction = previous instanceof RiverLane
@@ -107,7 +107,7 @@ class World {
             return new RiverLane(row, this.getDifficulty(row), direction);
         }
 
-        if (this.currentType === 'rail') {        // ← NOVO
+        if (this.currentType === 'rail') {
             this.moveSafeCol(); // no trilho também dá para andar para os lados
             return new RailLane(row, this.getDifficulty(row));
         }

@@ -3,31 +3,43 @@
  * Object.freeze impede que sejam alteradas por engano.
  */
 const CONFIG = Object.freeze({
+    // Tela e grid
     TILE: 48,           // tamanho de cada quadrado do grid, em pixels
     COLS: 11,           // colunas visíveis
     ROWS_VISIBLE: 14,   // faixas visíveis
-    WIDTH: 48 * 11,     // largura do canvas (528px)
-    HEIGHT: 48 * 14,    // altura do canvas (672px)
+    WIDTH: 48 * 11,     // largura lógica do canvas (528)
+    HEIGHT: 48 * 14,    // altura lógica do canvas (672)
+
+    // Fontes da bíblia visual
+    FONT_TITLE: '"Baloo 2", sans-serif', // títulos e números
+    FONT_TEXT: 'Nunito, sans-serif',     // textos e rótulos
+
+    // Mapa
     MAP_LENGTH: 100,    // número de faixas jogáveis
-    FONT_TITLE: '"Baloo 2", sans-serif', // títulos e números ← NOVO
-    FONT_TEXT: 'Nunito, sans-serif',     // textos e rótulos  ← NOVO
-    SCENERY_ROWS: 8,    // faixas de cenário em cada ponta do mapa  ← NOVO
-    SAFE_START_ROWS: 3,  // faixas iniciais sem obstáculos  ← NOVO
+    SCENERY_ROWS: 8,    // faixas de cenário em cada ponta do mapa
+    SAFE_START_ROWS: 3, // faixas iniciais sem obstáculos
+
+    // Capivara
     HOP_DURATION: 0.12, // duração de um pulo, em segundos
-    HOP_HEIGHT: 10,      // altura do arco do pulo, em pixels
-    SAFE_START_ROWS: 3,
-    ROAD_SPEED_MIN: 60,   // velocidade mínima dos veículos (pixels/segundo) ← NOVO
-    ROAD_SPEED_MAX: 140,  // velocidade máxima dos veículos (pixels/segundo) ← NOVO
-    RIVER_SPEED_MIN: 40,  // velocidade mínima dos jacarés (pixels/segundo) ← NOVO
-    RIVER_SPEED_MAX: 90,  // velocidade máxima dos jacarés (pixels/segundo) ← NOVO
-    TRAIN_SPEED_MIN: 700,   // velocidade mínima do trem (pixels/segundo) ← NOVO
-    TRAIN_SPEED_MAX: 900,   // velocidade máxima do trem (pixels/segundo) ← NOVO
-    RAIL_INTERVAL_MIN: 3,   // tempo mínimo entre trens (segundos)       ← NOVO
-    RAIL_INTERVAL_MAX: 6,   // tempo máximo entre trens (segundos)       ← NOVO
-    JAGUAR_SPEED: 0.5,          // faixas por segundo (1 faixa a cada 2 s)   ← NOVO
-    JAGUAR_START_ROW: -4,       // começa escondida na mata, atrás da cerca  ← NOVO
-    JAGUAR_START_DELAY: 3,      // segundos parada antes de começar a correr ← NOVO
-    JAGUAR_CATCH_DURATION: 0.35 // segundos para deslizar até a capivara    ← NOVO
+    HOP_HEIGHT: 10,     // altura do arco do pulo, em pixels
+
+    // Velocidades (pixels por segundo)
+    ROAD_SPEED_MIN: 60,
+    ROAD_SPEED_MAX: 140,
+    RIVER_SPEED_MIN: 40,
+    RIVER_SPEED_MAX: 90,
+    TRAIN_SPEED_MIN: 700,
+    TRAIN_SPEED_MAX: 900,
+
+    // Trilho
+    RAIL_INTERVAL_MIN: 3, // tempo mínimo entre trens, em segundos
+    RAIL_INTERVAL_MAX: 6, // tempo máximo entre trens, em segundos
+
+    // Onça
+    JAGUAR_SPEED: 0.5,          // faixas por segundo (1 faixa a cada 2 s)
+    JAGUAR_START_ROW: -4,       // começa escondida na mata, atrás da cerca
+    JAGUAR_START_DELAY: 3,      // segundos parada antes de começar a correr
+    JAGUAR_CATCH_DURATION: 0.35 // segundos para deslizar até a capivara
 });
 
 /**
@@ -39,7 +51,7 @@ const Utils = {
         return a + (b - a) * t;
     },
 
-    /** Número inteiro aleatório entre min e max, incluindo os dois. ← NOVO */
+    /** Número inteiro aleatório entre min e max, incluindo os dois. */
     randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
@@ -59,15 +71,15 @@ const Utils = {
         return Math.max(min, Math.min(max, value));
     },
 
-        /**
+    /**
      * Verifica se dois retângulos {x, y, width, height} se sobrepõem.
      * Eles se tocam quando se cruzam na horizontal E na vertical.
      */
     rectsOverlap(a, b) {
-            return a.x < b.x + b.width &&
-                   a.x + a.width > b.x &&
-                   a.y < b.y + b.height &&
-                   a.y + a.height > b.y;
+        return a.x < b.x + b.width &&
+               a.x + a.width > b.x &&
+               a.y < b.y + b.height &&
+               a.y + a.height > b.y;
     },
 
     /**
@@ -88,44 +100,46 @@ const Utils = {
 };
 
 /**
- * Paleta oficial do jogo, definida na bíblia visual do grupo.  ← NOVO
+ * Paleta oficial do jogo, definida na bíblia visual do grupo.
  * Todas as cores do jogo devem vir daqui.
  */
 const PALETTE = Object.freeze({
-    // Verdes
+    // Verdes (natureza)
     MATA_PROFUNDA: '#1F6B4A',
     FOLHA: '#2E9B5E',
     BROTO: '#6CC86A',
     CAPIM_LIMAO: '#A8E06B',
     VERDE_AGUA: '#3FB8A0',
+
+    // Amarelos (interação)
+    IPE: '#FFC83D',
+    MANGA: '#FFA62B',
+    MILHO: '#FFE066',
+    AREIA: '#FBE3A1',
+
+    // Azuis (detalhes e água)
+    CEU: '#5EC8F2',
+    RIO: '#2D8FD5',
+    RASO: '#8EE3F0',
+    AZULEJO: '#1E5AA8',
+
     // Terra e capivara
     PELAGEM: '#C98B55',
     PELAGEM_SOMBRA: '#A86C3D',
     TRONCO: '#8C5A3C',
-    // Neutros
-    ASFALTO_CLARO: '#6B7180', // ← NOVO
-    PAPEL: '#FFF8EC',
-    TINTA: '#2B2420',
-    // Amarelos (interação) ← NOVO
-    IPE: '#FFC83D',   // botões
-    MANGA: '#FFA62B', // hover de botões
-    MILHO: '#FFE066',           // ← NOVO: faróis e brilhos
-    AREIA: '#FBE3A1',      // ← NOVO: chão do trilho
-    // Azuis
-    CEU: '#5EC8F2',        // ← NOVO: luz do sinal
-    RIO: '#2D8FD5',
-    RASO: '#8EE3F0',            // ← NOVO: vidros
-    AZULEJO: '#1E5AA8',         // ← NOVO: veículos
+
     // Acentos
-    ACEROLA: '#FF6B5B',         // ← NOVO: veículos (perigo)
-    LARANJA_LIMA: '#FF7A2F',    // ← NOVO: veículos
+    ACEROLA: '#FF6B5B',
+    LARANJA_LIMA: '#FF7A2F',
+
     // Neutros
-    ASFALTO: '#4A4F5C',         // ← NOVO: ruas
+    ASFALTO: '#4A4F5C',
     ASFALTO_CLARO: '#6B7180',
     PAPEL: '#FFF8EC',
     TINTA: '#2B2420',
-    SOMBRA: 'rgba(43, 42, 85, 0.25)', // ← NOVO: sombras no chão (#2B2A55 a 25%)
-    // Medalhas ← NOVO
+    SOMBRA: 'rgba(43, 42, 85, 0.25)', // #2B2A55 a 25%
+
+    // Medalhas (fora da bíblia)
     PRATA: '#C9D1DB',
-    BRONZE: '#CD8A4E',
+    BRONZE: '#CD8A4E'
 });

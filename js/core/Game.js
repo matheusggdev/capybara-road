@@ -15,17 +15,17 @@ class Game {
         // Partes do jogo (composição)
         this.input = new InputHandler();
         this.camera = new Camera();
-        this.score = new ScoreManager(); // ← NOVO
+        this.score = new ScoreManager();
         this.world = new World();
         this.capybara = null;   // criada em startGame()
-        this.jaguar = null;     // ← NOVO: criada em startGame()
+        this.jaguar = null;     // criada em startGame()
         this.deathMessage = ''; // motivo da última derrota
 
         // Telas (padrão State): cada uma é um objeto com o seu comportamento
         this.screens = {
             menu: new MenuScreen(this),
             play: new PlayScreen(this),
-            pause: new PauseScreen(this),       // ← NOVO
+            pause: new PauseScreen(this),
             gameover: new GameOverScreen(this),
             victory: new VictoryScreen(this)
         };
@@ -35,7 +35,7 @@ class Game {
         canvas.addEventListener('click', (event) => this.handleClick(event));
         canvas.addEventListener('mousemove', (event) => this.handleMouseMove(event));
 
-        // NOVO: trocou de aba ou de janela no meio da partida? Pausa sozinho.
+        // trocou de aba ou de janela no meio da partida? Pausa sozinho.
         window.addEventListener('blur', () => this.pause());
 
         this.lastTime = 0;
@@ -85,7 +85,7 @@ class Game {
     goToMenu() {
         this.world = new World();
         this.capybara = null;
-        this.jaguar = null; // ← NOVO
+        this.jaguar = null;
         this.camera.y = CONFIG.TILE - CONFIG.HEIGHT; // mostra o início do mapa
         this.changeScreen('menu');
     }
@@ -97,7 +97,7 @@ class Game {
         const startCol = Math.floor(CONFIG.COLS / 2);
         this.capybara = new Capybara(startCol, 0);
 
-        // NOVO: a onça corre na coluna central, a partir da mata atrás da cerca
+        // a onça corre na coluna central, a partir da mata atrás da cerca
         this.jaguar = new Jaguar(startCol, CONFIG.JAGUAR_START_ROW, this.capybara);
 
         this.camera.follow(this.capybara);
@@ -107,13 +107,13 @@ class Game {
         this.changeScreen('play');
     }
 
-    /** NOVO: pausa a partida (só faz sentido durante o jogo). */
+    /** Pausa a partida (só faz sentido durante o jogo). */
     pause() {
         if (this.currentScreen !== this.screens.play) return;
         this.changeScreen('pause');
     }
 
-    /** NOVO: volta à partida exatamente de onde parou. */
+    /** Volta à partida exatamente de onde parou. */
     resume() {
         // descarta teclas apertadas durante o pause
         this.input.clear();
@@ -123,7 +123,7 @@ class Game {
     /** Chamado pela linha de chegada. */
     win() {
         if (this.currentScreen !== this.screens.play) return;
-        this.score.finishRun(true); // ← NOVO: medalha e recorde
+        this.score.finishRun(true); // medalha e recorde
         this.changeScreen('victory');
     }
 
@@ -136,7 +136,7 @@ class Game {
 
         this.capybara.die();
         this.deathMessage = message;
-        this.score.finishRun(false); // ← NOVO: sem medalha, mas pode bater recorde
+        this.score.finishRun(false); // sem medalha, mas pode bater recorde
         this.changeScreen('gameover');
     }
 

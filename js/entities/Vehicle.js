@@ -147,12 +147,6 @@ class Bus extends Vehicle {
     /** Cores possíveis: a faixa de baixo do ônibus. */
     static COLORS = [PALETTE.AZULEJO, PALETTE.ACEROLA, PALETTE.FOLHA];
 
-     /** Chance de a faixa ser de ônibus em vez de carros. */
-     static BUS_CHANCE = 0.25;
-
-     /** Ônibus andam mais devagar: 60% da velocidade de um carro. */
-     static BUS_SPEED_FACTOR = 0.6;
-
     constructor(x, y, speed) {
         const color = Bus.COLORS[Utils.randomInt(0, Bus.COLORS.length - 1)];
         super(x, y, 2.5, speed, color);
