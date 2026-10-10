@@ -15,6 +15,7 @@ class Game {
         // Partes do jogo (composição)
         this.input = new InputHandler();
         this.camera = new Camera();
+        this.score = new ScoreManager(); // ← NOVO
         this.world = new World();
         this.capybara = null;   // criada em startGame()
         this.jaguar = null;     // ← NOVO: criada em startGame()
@@ -101,6 +102,7 @@ class Game {
 
         this.camera.follow(this.capybara);
 
+        this.score.reset();
         this.input.clear();
         this.changeScreen('play');
     }
@@ -121,6 +123,7 @@ class Game {
     /** Chamado pela linha de chegada. */
     win() {
         if (this.currentScreen !== this.screens.play) return;
+        this.score.finishRun(true); // ← NOVO: medalha e recorde
         this.changeScreen('victory');
     }
 
@@ -133,6 +136,7 @@ class Game {
 
         this.capybara.die();
         this.deathMessage = message;
+        this.score.finishRun(false); // ← NOVO: sem medalha, mas pode bater recorde
         this.changeScreen('gameover');
     }
 

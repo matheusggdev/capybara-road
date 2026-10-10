@@ -29,6 +29,8 @@ class PlayScreen extends Screen {
 
         this.handlePlayerInput();
         game.capybara.update(dt);
+        game.score.update(dt);                  // ← NOVO: cronômetro
+        game.score.registerRow(game.capybara.row); // ← NOVO: faixa mais alta
         game.world.update(dt);
 
         // NOVO: a onça avança; se pegou, acabou

@@ -124,5 +124,8 @@ const PALETTE = Object.freeze({
     ASFALTO_CLARO: '#6B7180',
     PAPEL: '#FFF8EC',
     TINTA: '#2B2420',
-    SOMBRA: 'rgba(43, 42, 85, 0.25)' // ← NOVO: sombras no chão (#2B2A55 a 25%)
+    SOMBRA: 'rgba(43, 42, 85, 0.25)', // ← NOVO: sombras no chão (#2B2A55 a 25%)
+    // Medalhas ← NOVO
+    PRATA: '#C9D1DB',
+    BRONZE: '#CD8A4E',
 });
