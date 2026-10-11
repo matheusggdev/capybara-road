@@ -90,8 +90,18 @@ class Game {
         this.changeScreen('menu');
     }
 
-    /** Prepara uma nova partida. */
+    /** Começa uma nova partida na hora (usado por "Jogar de novo"). */
     startGame() {
+        this.prepareRun();
+        this.changeScreen('play');
+    }
+
+    /**
+     * Monta tudo o que a partida precisa (mundo, capivara, onça, placar),
+     * mas ainda não troca de tela. O menu usa isso para mostrar o mapa
+     * enquanto as nuvens se abrem, e só depois chama changeScreen('play').
+     */
+    prepareRun() {
         this.world = new World();
 
         const startCol = Math.floor(CONFIG.COLS / 2);
@@ -104,7 +114,6 @@ class Game {
 
         this.score.reset();
         this.input.clear();
-        this.changeScreen('play');
     }
 
     /** Pausa a partida (só faz sentido durante o jogo). */
