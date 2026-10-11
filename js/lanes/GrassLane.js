@@ -9,7 +9,7 @@ class GrassLane extends Lane {
     static MAX_OBSTACLES = 4;
 
     /** Chance de a faixa ter uma laranja. */
-    static ORANGE_CHANCE = 0.2;
+    static ORANGE_CHANCE = 0.3;
 
     /**
      * @param {number}  row        linha da faixa no mapa

@@ -91,9 +91,10 @@ class PlayScreen extends Screen {
         lane.onPlayerInside(capybara, this.game);
     }
 
-    /** Sobrescreve Screen.draw(): os personagens e o botão de pause. */
+    /** Sobrescreve Screen.draw(): os personagens, o contador de laranjas e o pause. */
     draw(ctx) {
         this.drawCharacters(ctx); // onça + capivara
+        this.drawOrangeCounter(ctx);
         this.drawButtons(ctx);
     }
 }

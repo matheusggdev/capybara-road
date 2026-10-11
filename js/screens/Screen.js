@@ -84,6 +84,42 @@ class Screen {
         if (capybara) capybara.draw(ctx, camera);
     }
 
+        /**
+     * Contador de laranjas no canto superior esquerdo:
+     * um selo claro com a laranja e o número coletado.
+     */
+    drawOrangeCounter(ctx) {
+        const count = this.game.score.oranges;
+        const x = 16;
+        const y = 20;
+        const height = 44;
+
+        ctx.font = `800 26px ${CONFIG.FONT_TITLE}`;
+        const textWidth = ctx.measureText(String(count)).width;
+        const width = 58 + textWidth;
+
+        // selo no estilo "adesivo": espessura escura embaixo e contorno Tinta
+        ctx.fillStyle = PALETTE.TINTA;
+        ctx.beginPath();
+        ctx.roundRect(x, y + 4, width, height, height / 2);
+        ctx.fill();
+
+        ctx.fillStyle = PALETTE.PAPEL;
+        ctx.strokeStyle = PALETTE.TINTA;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, height / 2);
+        ctx.fill();
+        ctx.stroke();
+
+        Orange.drawIcon(ctx, x + 24, y + height / 2 + 1, 11);
+
+        ctx.fillStyle = PALETTE.TINTA;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(count), x + 44, y + height / 2 + 2);
+    }
+    
     /** Escurece o fundo, para destacar textos e botões. */
     drawOverlay(ctx, alpha = 0.4) {
         ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
