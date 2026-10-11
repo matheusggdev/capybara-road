@@ -4,45 +4,51 @@
  * acrescenta por cima o recorde e os controles.
  *
  * Herança: Screen -> MenuScreen
+ * Composição: o menu TEM uma CloudCurtain (a cortina de nuvens)
+ * e um ImageButton (o botão de jogar).
  *
  * As nuvens funcionam como uma cortina:
- *   - ao clicar em jogar, a imagem de nuvens se ABRE pelo meio
- *     (a metade esquerda sai pela esquerda, a direita pela direita)
- *     e revela o mapa;
- *   - ao voltar de uma partida, ela se FECHA sobre o mapa.
+ *   - ao clicar em jogar, o logo e o botão somem na hora, e as nuvens
+ *     se ABREM pelo meio, revelando o mapa;
+ *   - ao voltar de uma partida, elas se FECHAM sobre o mapa.
  *
- * Usa duas imagens:
+ * Usa três imagens:
  *   menu.png        → a arte completa (logo, botão e nuvens)
  *   menu-clouds.png → só as nuvens, sem logo e botão (para a cortina)
+ *   button.png      → só o botão, com fundo transparente (para o hover)
  */
 class MenuScreen extends Screen {
     /** Duração da abertura e do fechamento das nuvens, em segundos. */
-    static OPEN_DURATION = 1.2;
-    static CLOSE_DURATION = 0.9;
+    static OPEN_DURATION = 1.4;
+    static CLOSE_DURATION = 1.0;
 
-    /** Tamanho original das imagens, em pixels. */
+    /** Tamanho original das imagens do menu, em pixels. */
     static IMAGE_WIDTH = 1024;
     static IMAGE_HEIGHT = 1536;
 
-    /** Onde ficam o logo e o botão DENTRO da imagem (em pixels da imagem). */
-    static LOGO_AREA = { x: 192, y: 364, width: 640, height: 422 };
+    /** Áreas DENTRO da imagem (em pixels da imagem). */
     static BUTTON_AREA = { x: 358, y: 885, width: 307, height: 167 };
+    static BUTTON_SPRITE_AREA = { x: 340, y: 855, width: 350, height: 220 };
 
     constructor(game) {
         super(game);
 
         this.menuImage = MenuScreen.loadImage('assets/images/menu.png');
-        this.cloudsImage = MenuScreen.loadImage('assets/images/menu-clouds.png');
+        const cloudsImage = MenuScreen.loadImage('assets/images/menu-clouds.png');
+        const buttonImage = MenuScreen.loadImage('assets/images/button.png');
 
         // A imagem é desenhada cobrindo a largura do jogo; como ela é
         // mais alta que a tela, sobra um pouco em cima e embaixo (cortado).
         this.scale = CONFIG.WIDTH / MenuScreen.IMAGE_WIDTH;
-        this.offsetY = (CONFIG.HEIGHT - MenuScreen.IMAGE_HEIGHT * this.scale) / 2;
+        this.imageHeight = MenuScreen.IMAGE_HEIGHT * this.scale;
+        this.offsetY = (CONFIG.HEIGHT - this.imageHeight) / 2;
 
-        // área clicável do botão, convertida para a tela
-        const area = this.toScreen(MenuScreen.BUTTON_AREA);
+        this.curtain = new CloudCurtain(cloudsImage, CONFIG.WIDTH, this.imageHeight, this.offsetY);
+
         this.buttons.push(new ImageButton(
-            area.x, area.y, area.width, area.height,
+            this.toScreen(MenuScreen.BUTTON_AREA),
+            buttonImage,
+            this.toScreen(MenuScreen.BUTTON_SPRITE_AREA),
             () => this.startOpening()
         ));
 
@@ -59,11 +65,6 @@ class MenuScreen extends Screen {
         return image;
     }
 
-    /** A imagem já terminou de carregar? */
-    static isReady(image) {
-        return image.complete && image.naturalWidth > 0;
-    }
-
     /**
      * Converte um retângulo em pixels da imagem para pixels da tela.
      * @param {{x, y, width, height}} area
@@ -77,9 +78,9 @@ class MenuScreen extends Screen {
         };
     }
 
-    /** Suaviza o movimento: começa e termina devagar. */
-    static easeInOut(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    /** O menu está parado e fechado (mostrando a arte completa)? */
+    get isResting() {
+        return this.state === 'idle' && this.openness === 0;
     }
 
     /* ================================================================
@@ -100,14 +101,21 @@ class MenuScreen extends Screen {
 
     /** Clique em jogar: prepara a partida e começa a abrir as nuvens. */
     startOpening() {
-        if (this.state !== 'idle') return;
+        if (!this.isResting) return;
         this.game.prepareRun();
         this.state = 'opening';
+        this.game.canvas.style.cursor = 'default';
     }
 
-    /** Sobrescreve Screen.handleClick(): ignora cliques durante a animação. */
+    /** Sobrescreve Screen.handleClick(): só aceita cliques com o menu parado. */
     handleClick(x, y) {
-        if (this.state === 'idle') super.handleClick(x, y);
+        if (this.isResting) super.handleClick(x, y);
+    }
+
+    /** Sobrescreve Screen.handleMouseMove(): sem hover durante a animação. */
+    handleMouseMove(x, y) {
+        if (!this.isResting) return false;
+        return super.handleMouseMove(x, y);
     }
 
     /** Sobrescreve Screen.update(): avança a abertura ou o fechamento. */
@@ -131,93 +139,34 @@ class MenuScreen extends Screen {
 
     /** Sobrescreve Screen.draw(). */
     draw(ctx) {
-        // imagens ainda carregando: só o céu
-        if (!MenuScreen.isReady(this.menuImage) || !MenuScreen.isReady(this.cloudsImage)) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        if (this.isResting) {
+            this.drawRestingMenu(ctx);
+        } else {
+            // abrindo para jogar: a capivara e a onça já aparecem no mapa
+            if (this.state === 'opening') this.drawCharacters(ctx);
+            this.curtain.draw(ctx, this.openness);
+        }
+
+        ctx.restore();
+    }
+
+    /** O menu parado: a arte completa, o botão, o recorde e os controles. */
+    drawRestingMenu(ctx) {
+        // imagem ainda carregando: só o céu
+        if (!this.menuImage.complete || this.menuImage.naturalWidth === 0) {
             ctx.fillStyle = '#A9C4EA';
             ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
             return;
         }
 
-        ctx.save();
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        if (this.state === 'idle' && this.openness === 0) {
-            // parado: a arte inteira, exatamente como a imagem
-            this.drawFullImage(ctx, this.menuImage);
-        } else {
-            // abrindo para jogar: a capivara e a onça já aparecem no mapa
-            if (this.state === 'opening') this.drawCharacters(ctx);
-            this.drawCurtain(ctx);
-            this.drawFadingLogo(ctx);
-        }
-
-        ctx.restore();
-
-        // por cima da arte: o brilho do botão, o recorde e os controles
-        const uiAlpha = this.getUiAlpha();
-        if (uiAlpha <= 0) return;
-        ctx.save();
-        ctx.globalAlpha = uiAlpha;
+        ctx.drawImage(this.menuImage, 0, this.offsetY, CONFIG.WIDTH, this.imageHeight);
         this.drawButtons(ctx);
         this.drawHighScore(ctx);
         this.drawControls(ctx);
-        ctx.restore();
-    }
-
-    /** Logo, botão e textos somem rápido, antes das nuvens se afastarem. */
-    getUiAlpha() {
-        return Utils.clamp(1 - this.openness * 3, 0, 1);
-    }
-
-    /** Desenha uma imagem cobrindo a tela inteira. */
-    drawFullImage(ctx, image) {
-        ctx.drawImage(
-            image,
-            0, this.offsetY,
-            CONFIG.WIDTH, MenuScreen.IMAGE_HEIGHT * this.scale
-        );
-    }
-
-    /** As duas metades das nuvens, cada uma indo para o seu lado. */
-    drawCurtain(ctx) {
-        const eased = MenuScreen.easeInOut(this.openness);
-        const halfImage = MenuScreen.IMAGE_WIDTH / 2;
-        const halfScreen = CONFIG.WIDTH / 2;
-        const height = MenuScreen.IMAGE_HEIGHT * this.scale;
-        const shift = halfScreen * eased;
-
-        // metade esquerda → sai pela esquerda
-        ctx.drawImage(
-            this.cloudsImage,
-            0, 0, halfImage, MenuScreen.IMAGE_HEIGHT,
-            -shift, this.offsetY, halfScreen, height
-        );
-
-        // metade direita → sai pela direita
-        ctx.drawImage(
-            this.cloudsImage,
-            halfImage, 0, halfImage, MenuScreen.IMAGE_HEIGHT,
-            halfScreen + shift, this.offsetY, halfScreen, height
-        );
-    }
-
-    /** O logo e o botão, recortados da arte, sumindo aos poucos. */
-    drawFadingLogo(ctx) {
-        const alpha = this.getUiAlpha();
-        if (alpha <= 0) return;
-
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        for (const area of [MenuScreen.LOGO_AREA, MenuScreen.BUTTON_AREA]) {
-            const target = this.toScreen(area);
-            ctx.drawImage(
-                this.menuImage,
-                area.x, area.y, area.width, area.height,
-                target.x, target.y, target.width, target.height
-            );
-        }
-        ctx.restore();
     }
 
     /** Selo com o recorde (só depois da primeira partida). */
@@ -230,20 +179,9 @@ class MenuScreen extends Screen {
         const width = ctx.measureText(text).width + 40;
         const height = 40;
         const x = (CONFIG.WIDTH - width) / 2;
-        const y = 520;
+        const y = 515;
 
-        ctx.fillStyle = PALETTE.TINTA;
-        ctx.beginPath();
-        ctx.roundRect(x, y + 4, width, height, height / 2);
-        ctx.fill();
-
-        ctx.fillStyle = PALETTE.PAPEL;
-        ctx.strokeStyle = PALETTE.TINTA;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.roundRect(x, y, width, height, height / 2);
-        ctx.fill();
-        ctx.stroke();
+        this.drawSticker(ctx, x, y, width, height, PALETTE.PAPEL);
 
         ctx.fillStyle = PALETTE.TINTA;
         ctx.textAlign = 'center';
@@ -251,23 +189,109 @@ class MenuScreen extends Screen {
         ctx.fillText(text, CONFIG.WIDTH / 2, y + height / 2 + 2);
     }
 
-    /** Os controles, num selo discreto no rodapé. */
+    /**
+     * Os controles: um cartão com as teclas desenhadas
+     * (setas para andar, P para pausar).
+     */
     drawControls(ctx) {
-        const text = 'Setas ou WASD para andar  ·  P para pausar';
-        ctx.font = `700 15px ${CONFIG.FONT_TEXT}`;
-        const width = ctx.measureText(text).width + 32;
-        const height = 30;
+        const keySize = 28;
+        const gap = 6;
+        const height = 54;
+        const width = 372;
         const x = (CONFIG.WIDTH - width) / 2;
-        const y = 622;
+        const y = 590;
+        const keyY = y + (height - keySize) / 2 - 2;
 
-        ctx.fillStyle = 'rgba(43, 36, 32, 0.6)';
+        this.drawSticker(ctx, x, y, width, height, PALETTE.PAPEL);
+
+        // setas
+        let keyX = x + 18;
+        for (const direction of ['left', 'up', 'down', 'right']) {
+            this.drawKey(ctx, keyX, keyY, keySize, direction);
+            keyX += keySize + gap;
+        }
+        this.drawLabel(ctx, 'Andar', keyX + 6, y + height / 2);
+
+        // divisória
+        const dividerX = x + 232;
+        ctx.fillStyle = 'rgba(43, 36, 32, 0.2)';
+        ctx.fillRect(dividerX, y + 12, 2, height - 24);
+
+        // pausa
+        this.drawKey(ctx, dividerX + 16, keyY, keySize, 'P');
+        this.drawLabel(ctx, 'Pausar', dividerX + 16 + keySize + 10, y + height / 2);
+    }
+
+    /**
+     * Uma tecla de teclado no estilo adesivo.
+     * @param {string} symbol 'left', 'up', 'down', 'right' (seta) ou uma letra
+     */
+    drawKey(ctx, x, y, size, symbol) {
+        // espessura e face da tecla
+        ctx.fillStyle = PALETTE.TINTA;
         ctx.beginPath();
-        ctx.roundRect(x, y, width, height, height / 2);
+        ctx.roundRect(x, y + 4, size, size, 7);
         ctx.fill();
 
-        ctx.fillStyle = PALETTE.PAPEL;
-        ctx.textAlign = 'center';
+        ctx.fillStyle = PALETTE.IPE;
+        ctx.strokeStyle = PALETTE.TINTA;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(x, y, size, size, 7);
+        ctx.fill();
+        ctx.stroke();
+
+        const cx = x + size / 2;
+        const cy = y + size / 2;
+        ctx.fillStyle = PALETTE.TINTA;
+
+        // letra
+        const angles = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
+        if (!(symbol in angles)) {
+            ctx.font = `800 18px ${CONFIG.FONT_TITLE}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(symbol, cx, cy + 1);
+            return;
+        }
+
+        // seta: um triângulo girado para a direção
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angles[symbol]);
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(-4, -6);
+        ctx.lineTo(-4, 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    /** Texto ao lado das teclas. */
+    drawLabel(ctx, text, x, centerY) {
+        ctx.fillStyle = PALETTE.TINTA;
+        ctx.font = `800 19px ${CONFIG.FONT_TITLE}`;
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(text, CONFIG.WIDTH / 2, y + height / 2 + 1);
+        ctx.fillText(text, x, centerY + 2);
+    }
+
+    /** Fundo de adesivo: espessura escura embaixo, face clara e contorno. */
+    drawSticker(ctx, x, y, width, height, color) {
+        const radius = height / 2;
+
+        ctx.fillStyle = PALETTE.TINTA;
+        ctx.beginPath();
+        ctx.roundRect(x, y + 5, width, height, radius);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.strokeStyle = PALETTE.TINTA;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, radius);
+        ctx.fill();
+        ctx.stroke();
     }
 }

@@ -1,18 +1,26 @@
 /**
- * Botão "invisível" sobre uma imagem: a arte do botão já faz parte
- * da imagem do menu, então este botão só marca a área clicável
- * e clareia a arte quando o mouse passa por cima.
+ * Botão feito de imagem: a arte do botão já aparece na imagem do menu;
+ * este objeto marca a área clicável e, com o mouse em cima, desenha
+ * a arte do botão (recortada, com fundo transparente) um pouco maior,
+ * como se ela "saltasse" para fora da tela.
  *
  * Herança: Button -> ImageButton
- * Reaproveita contains() e click() da mãe e sobrescreve só o draw().
+ * Reaproveita contains() e click() da mãe e sobrescreve o draw().
  */
 class ImageButton extends Button {
+    /** Quanto o botão cresce com o mouse em cima. */
+    static HOVER_SCALE = 1.08;
+
     /**
-     * @param {number}   x, y, width, height área clicável, em pixels lógicos
-     * @param {Function} onClick             ação ao clicar
+     * @param {{x, y, width, height}} area    área clicável, em pixels lógicos
+     * @param {HTMLImageElement}      sprite  arte do botão com fundo transparente
+     * @param {{x, y, width, height}} spriteArea onde a arte é desenhada
+     * @param {Function}              onClick ação ao clicar
      */
-    constructor(x, y, width, height, onClick) {
-        super(x, y, width, height, '', onClick);
+    constructor(area, sprite, spriteArea, onClick) {
+        super(area.x, area.y, area.width, area.height, '', onClick);
+        this.sprite = sprite;
+        this.spriteArea = spriteArea;
     }
 
     /** Sobrescreve Button.contains(): só a área da arte, sem a "espessura". */
@@ -21,13 +29,19 @@ class ImageButton extends Button {
                py >= this.y && py <= this.y + this.height;
     }
 
-    /** Sobrescreve Button.draw(): a arte já está na imagem; só o brilho do hover. */
+    /** Sobrescreve Button.draw(): parado, a arte já está na imagem; no hover, cresce. */
     draw(ctx) {
-        if (!this.isHovered) return;
+        if (!this.isHovered || !this.sprite.complete) return;
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.beginPath();
-        ctx.roundRect(this.x, this.y, this.width, this.height, 8);
-        ctx.fill();
+        const { x, y, width, height } = this.spriteArea;
+        const scale = ImageButton.HOVER_SCALE;
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.scale(scale, scale);
+        ctx.drawImage(this.sprite, -width / 2, -height / 2, width, height);
+        ctx.restore();
     }
 }
