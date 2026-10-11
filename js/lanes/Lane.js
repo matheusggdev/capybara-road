@@ -40,13 +40,17 @@ class Lane {
 
     /**
      * Atualiza a faixa a cada quadro: por padrão,
-     * atualiza todas as entidades que estão nela.
+     * atualiza todas as entidades que estão nela e
+     * remove as que foram desativadas.
      * @param {number} dt tempo desde o último quadro, em segundos
      */
     update(dt) {
         for (const entity of this.entities) {
             entity.update(dt);
         }
+
+        // remove as entidades desativadas (ex.: laranjas coletadas)
+        this.entities = this.entities.filter(entity => entity.active);
     }
 
     /**
@@ -120,7 +124,7 @@ class Lane {
     checkCollisions(player, game) {
         for (const entity of this.entities) {
             if (!player.alive) return; // já perdeu: para de verificar
-            if (entity.intersects(player)) {
+            if (entity.active && entity.intersects(player)) {
                 entity.onPlayerCollision(game);
             }
         }

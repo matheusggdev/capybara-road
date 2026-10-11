@@ -23,6 +23,7 @@ class Entity {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.active = true; // quando false, a faixa remove a entidade
     }
 
     /**

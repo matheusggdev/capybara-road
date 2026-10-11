@@ -46,6 +46,7 @@ class Capybara extends Entity {
         this.facing = 1;
 
         this.alive = true;
+        this.hasOrange = false;  // ganha uma laranja na cabeça ao coletar a primeira
         this.isSwimming = false; // definido pela PlayScreen a cada quadro
         this.animTime = 0;       // relógio das animações
 
@@ -215,15 +216,19 @@ class Capybara extends Entity {
             // derrotada: "tapetinho" achatado, de lado
             ctx.scale(1.3 * this.facing, 0.45);
             this.drawSide(ctx);
+            this.drawOrangeOnHead(ctx, 'side');
         } else {
             ctx.scale(this.scaleX, this.scaleY);
             if (this.direction === 'up') {
                 this.drawBack(ctx);
+                this.drawOrangeOnHead(ctx, 'back');
             } else if (this.direction === 'down') {
                 this.drawFront(ctx);
+                this.drawOrangeOnHead(ctx, 'front');
             } else {
                 ctx.scale(this.facing, 1); // a vista de lado é desenhada virada para a direita
                 this.drawSide(ctx);
+                this.drawOrangeOnHead(ctx, 'side');
             }
         }
 
@@ -413,6 +418,24 @@ class Capybara extends Entity {
         ctx.beginPath();
         ctx.arc(x + 0.8, y - 1.2, 0.9, 0, Math.PI * 2);
         ctx.fill();
+    }
+
+    /** Onde fica a laranja em cada vista: [x, y] do centro dela. */
+    static ORANGE_POSITION = {
+        side: [10, -46],
+        back: [0, -45],
+        front: [0, -50]
+    };
+
+    /**
+     * A marca registrada: a laranja na cabeça, depois da primeira coletada.
+     * Reaproveita o desenho da classe Orange (método estático).
+     * @param {string} view 'side', 'back' ou 'front'
+     */
+    drawOrangeOnHead(ctx, view) {
+        if (!this.hasOrange) return;
+        const [x, y] = Capybara.ORANGE_POSITION[view];
+        Orange.drawIcon(ctx, x, y, 6, Capybara.OUTLINE / Capybara.DRAW_SCALE);
     }
 
     /** Bochecha rosada. */

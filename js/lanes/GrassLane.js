@@ -1,12 +1,15 @@
 /**
  * Faixa de grama: lugar seguro, mas com árvores e pedras
- * que bloqueiam o caminho.
+ * que bloqueiam o caminho. Às vezes tem uma laranja.
  *
  * Herança: Lane -> GrassLane
  */
 class GrassLane extends Lane {
     /** Máximo de obstáculos sorteados por faixa. */
     static MAX_OBSTACLES = 4;
+
+    /** Chance de a faixa ter uma laranja. */
+    static ORANGE_CHANCE = 0.2;
 
     /**
      * @param {number}  row        linha da faixa no mapa
@@ -23,6 +26,7 @@ class GrassLane extends Lane {
 
         if (!isSafeZone) {
             this.placeObstacles(safeCol);
+            this.placeOrange();
         }
     }
 
@@ -44,6 +48,19 @@ class GrassLane extends Lane {
                 : new Rock(col, this.y);
             this.entities.push(obstacle);
         }
+    }
+
+    /** Às vezes coloca uma laranja numa coluna livre. */
+    placeOrange() {
+        if (Math.random() > GrassLane.ORANGE_CHANCE) return;
+
+        const freeCols = [];
+        for (let col = 0; col < CONFIG.COLS; col++) {
+            if (!this.blockedCols.has(col)) freeCols.push(col);
+        }
+
+        const col = freeCols[Utils.randomInt(0, freeCols.length - 1)];
+        this.entities.push(new Orange(col, this.y));
     }
 
     /** Sobrescreve Lane.isBlocked(): bloqueia onde há obstáculo. */
