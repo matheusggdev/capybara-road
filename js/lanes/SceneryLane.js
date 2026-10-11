@@ -1,63 +1,40 @@
 /**
- * Faixa de cenário: mata densa nas pontas do mapa.
+ * Faixa de cenário: a floresta no começo e no fim do mapa.
  * Existe só para preencher a tela; a capivara nunca entra nela.
  *
- * Herança: Lane -> SceneryLane
+ * Herança: Lane -> GrassLane -> SceneryLane
+ * Uma floresta "é uma" faixa de grama com árvores em TODAS as
+ * colunas. Por isso reaproveita da GrassLane o chão listrado e
+ * o isBlocked(), que já bloqueia as colunas com árvore.
  */
-class SceneryLane extends Lane {
+class SceneryLane extends GrassLane {
+    /** Chance de cada coluna ter uma pedra em vez de árvore. */
+    static ROCK_CHANCE = 0.1;
+
     /**
-     * Sobrescreve Lane.isBlocked(): todas as colunas são bloqueadas.
-     * (Na prática a capivara nem chega aqui, mas a regra fica explícita.)
+     * @param {number}      row      linha da faixa no mapa
+     * @param {number|null} trailCol coluna sem árvores, por onde
+     *                               a onça corre (null = floresta fechada)
      */
-    isBlocked(col) {
-        return true;
+    constructor(row, trailCol = null) {
+        // safeCol -1 e isSafeZone true: a mãe não sorteia nada,
+        // porque quem planta a floresta é esta classe
+        super(row, -1, true);
+        this.trailCol = trailCol;
+        this.plantForest();
     }
 
-    /**
-     * Sobrescreve Lane.drawBackground(): fundo escuro com copas de árvores.
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {Camera} camera
-     */
-    drawBackground(ctx, camera) {
-        const T = CONFIG.TILE;
-        const screenY = camera.toScreenY(this.y);
+    /** Coloca uma árvore (ou, às vezes, uma pedra) em cada coluna, menos na trilha. */
+    plantForest() {
+        for (let col = 0; col < CONFIG.COLS; col++) {
+            // a coluna continua bloqueada para a capivara, mesmo na trilha
+            this.blockedCols.add(col);
+            if (col === this.trailCol) continue;
 
-        // chão escuro da mata
-        ctx.fillStyle = PALETTE.MATA_PROFUNDA;
-        ctx.fillRect(0, screenY, CONFIG.WIDTH, T);
-
-        // uma copa de árvore por coluna, deslocada nas linhas ímpares
-        // para não formar uma grade certinha
-        const offset = Math.abs(this.row) % 2 === 0 ? 0 : T / 2;
-        const centers = [];
-        for (let x = -T / 2 + offset; x < CONFIG.WIDTH + T; x += T) {
-            centers.push(x + T / 2);
-        }
-        const centerY = screenY + T / 2;
-        const radius = T * 0.45;
-
-        // primeiro o contorno de todas, depois o preenchimento por cima:
-        // as copas vizinhas se fundem num contorno só
-        ctx.strokeStyle = PALETTE.TINTA;
-        ctx.lineWidth = 5;
-        for (const cx of centers) {
-            ctx.beginPath();
-            ctx.arc(cx, centerY, radius, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-        ctx.fillStyle = PALETTE.FOLHA;
-        for (const cx of centers) {
-            ctx.beginPath();
-            ctx.arc(cx, centerY, radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // brilho do sol em cada copa
-        ctx.fillStyle = PALETTE.BROTO;
-        for (const cx of centers) {
-            ctx.beginPath();
-            ctx.ellipse(cx - 6, centerY - 8, 6, 3.5, -0.4, 0, Math.PI * 2);
-            ctx.fill();
+            const obstacle = Math.random() < SceneryLane.ROCK_CHANCE
+                ? new Rock(col, this.y)
+                : new Tree(col, this.y);
+            this.entities.push(obstacle);
         }
     }
 }

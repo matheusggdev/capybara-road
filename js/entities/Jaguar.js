@@ -137,6 +137,7 @@ class Jaguar extends Entity {
         const speed = this.state === 'catching' ? 22 : 12;
         const cycle = isRunning ? this.animTime * speed : 0;
         const bounce = isRunning ? Math.abs(Math.sin(cycle)) * 3 : 0;
+        const leap = this.getFenceLeap();
 
         // sombra
         ctx.fillStyle = PALETTE.SOMBRA;
@@ -145,7 +146,7 @@ class Jaguar extends Entity {
         ctx.fill();
 
         ctx.save();
-        ctx.translate(centerX, groundY - bounce);
+        ctx.translate(centerX, groundY - bounce - leap);
         ctx.scale(Jaguar.DRAW_SCALE, Jaguar.DRAW_SCALE);
         ctx.lineWidth = Jaguar.OUTLINE / Jaguar.DRAW_SCALE;
         ctx.lineJoin = 'round';
@@ -159,6 +160,17 @@ class Jaguar extends Entity {
         ctx.restore();
     }
 
+    /**
+     * Altura do salto ao passar pela cerca (linha -1): sobe e desce
+     * enquanto ela está a menos de meia faixa da cerca.
+     * @returns {number} altura em pixels (0 longe da cerca)
+     */
+    getFenceLeap() {
+        const distance = Math.abs(this.row - (-1));
+        if (distance >= 0.5) return 0;
+        return Math.cos((distance / 0.5) * (Math.PI / 2)) * 22;
+    }
+    
     /** Cabeça e orelhas, aparecendo atrás do corpo. */
     drawHead(ctx) {
         for (const side of [-1, 1]) {

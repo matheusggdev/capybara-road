@@ -43,8 +43,11 @@ class World {
         const scenery = CONFIG.SCENERY_ROWS;
         const finishRow = CONFIG.MAP_LENGTH;
 
+        // floresta atrás da cerca, com a trilha por onde a onça vem
+        // (a mesma coluna central usada em Game.startGame)
+        const trailCol = Math.floor(CONFIG.COLS / 2);
         for (let row = -scenery; row <= -2; row++) {
-            this.addLane(new SceneryLane(row));
+            this.addLane(new SceneryLane(row, trailCol));
         }
 
         this.addLane(new BoundaryLane(-1));
