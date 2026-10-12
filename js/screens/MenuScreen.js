@@ -276,22 +276,4 @@ class MenuScreen extends Screen {
         ctx.textBaseline = 'middle';
         ctx.fillText(text, x, centerY + 2);
     }
-
-    /** Fundo de adesivo: espessura escura embaixo, face clara e contorno. */
-    drawSticker(ctx, x, y, width, height, color) {
-        const radius = height / 2;
-
-        ctx.fillStyle = PALETTE.TINTA;
-        ctx.beginPath();
-        ctx.roundRect(x, y + 5, width, height, radius);
-        ctx.fill();
-
-        ctx.fillStyle = color;
-        ctx.strokeStyle = PALETTE.TINTA;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.roundRect(x, y, width, height, radius);
-        ctx.fill();
-        ctx.stroke();
-    }
 }

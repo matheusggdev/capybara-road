@@ -9,8 +9,10 @@ class PauseScreen extends Screen {
     constructor(game) {
         super(game);
 
-        this.addButton(390, 260, 'CONTINUAR', () => this.game.resume());
-        this.addButton(465, 260, 'MENU', () => this.game.goToMenu());
+        this.addButtonRow(568, [
+            { text: 'CONTINUAR', width: 210, onClick: () => this.game.resume() },
+            { text: 'MENU', width: 150, onClick: () => this.game.goToMenu() }
+        ]);
     }
 
     /**
@@ -26,14 +28,18 @@ class PauseScreen extends Screen {
     /** Sobrescreve Screen.draw(). */
     draw(ctx) {
         const score = this.game.score;
-        const time = ScoreManager.formatTime(score.elapsed);
 
+        this.drawOverlay(ctx, 0.45);
         this.drawCharacters(ctx);
-        this.drawOverlay(ctx, 0.5);
 
-        this.drawCenteredText(ctx, 'PAUSADO', 250, `800 56px ${CONFIG.FONT_TITLE}`, PALETTE.PAPEL);
-        this.drawCenteredText(ctx, `Pontos: ${score.points}    Tempo: ${time}`, 295, `700 20px ${CONFIG.FONT_TEXT}`, PALETTE.IPE);
-        this.drawCenteredText(ctx, 'Pressione P ou Esc para continuar', 340, `700 16px ${CONFIG.FONT_TEXT}`, PALETTE.PAPEL);
+        this.drawStickerTitle(ctx, 'PAUSADO', 125, 72, PALETTE.PAPEL);
+        this.drawPill(ctx, 'Pressione P ou Esc para continuar', 150);
+
+        this.drawStatsCard(ctx, 412, [
+            { label: 'PONTOS', value: String(score.points) },
+            { label: 'LARANJAS', value: String(score.oranges), isOrange: true },
+            { label: 'TEMPO', value: ScoreManager.formatTime(score.elapsed) }
+        ]);
 
         this.drawButtons(ctx);
     }
