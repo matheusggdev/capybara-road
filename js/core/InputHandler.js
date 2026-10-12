@@ -6,7 +6,7 @@
  */
 class InputHandler {
     /** Máximo de movimentos guardados de uma vez. */
-    static MAX_QUEUE = 2;
+    static MAX_QUEUE = 5;
 
     /** Teclas que pedem pause. */
     static PAUSE_KEYS = ['KeyP', 'Escape'];
@@ -69,6 +69,18 @@ class InputHandler {
         const requested = this.pauseRequested;
         this.pauseRequested = false;
         return requested;
+    }
+
+    /**
+     * Devolve só o movimento MAIS RECENTE da fila e descarta os outros.
+     * Usado na água: como a braçada é lenta, as teclas antigas já
+     * ficaram "velhas" e vale a última intenção do jogador.
+     * @returns {string|null}
+     */
+    consumeLatestMove() {
+        const latest = this.moveQueue.pop() || null;
+        this.moveQueue = [];
+        return latest;
     }
 
     /** Esquece tudo o que estava pendente (ex.: ao começar ou retomar a partida). */

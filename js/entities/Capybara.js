@@ -123,7 +123,10 @@ class Capybara extends Entity {
     /** Move a capivara no ar e a estica durante o pulo. */
     updateHop(dt) {
         this.hopTimer += dt;
-        const t = Math.min(this.hopTimer / CONFIG.HOP_DURATION, 1);
+        
+        // na água a capivara nada: cada movimento demora mais
+        const duration = this.isSwimming ? CONFIG.SWIM_HOP_DURATION : CONFIG.HOP_DURATION;
+        const t = Math.min(this.hopTimer / duration, 1);
 
         this.x = Utils.lerp(this.startX, this.targetX, t);
         this.y = Utils.lerp(this.startY, this.targetY, t);
