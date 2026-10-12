@@ -2,8 +2,8 @@
  * Classe ABSTRATA que representa uma faixa horizontal do mapa
  * (uma linha inteira do grid).
  *
- * Herança: Lane -> GrassLane (e, nas próximas etapas,
- * RoadLane, RiverLane, RailLane, BoundaryLane, FinishLane)
+ * Herança: Lane -> GrassLane, RoadLane, RiverLane, RailLane,
+ * BoundaryLane, FinishLane (e GrassLane -> SceneryLane)
  */
 class Lane {
     /**

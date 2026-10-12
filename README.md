@@ -229,7 +229,7 @@ O mesmo princípio aparece em outros lugares:
 ## Créditos
 
 - **Inspiração:** Crossy Road (Hipster Whale) e Frogger (Konami).
-- **Bíblia visual** (paleta, estilo dos personagens e da interface): [NOME DA COLEGA].
+- **Bíblia visual** (paleta, estilo dos personagens e da interface): <a href="https://github.com/melolivaa">Mel Oliva Motta</a>.
 - **Arte do menu:** gerada com ChatGPT (OpenAI) e adaptada pelo grupo (recortes do logo, do botão e da camada de nuvens).
 - **Fontes:** [Baloo 2](https://fonts.google.com/specimen/Baloo+2) e [Nunito](https://fonts.google.com/specimen/Nunito), via Google Fonts, sob a SIL Open Font License.
 - **Desenvolvimento:** o código foi construído de forma incremental com o auxílio do assistente de IA **Claude** (Anthropic), que explicou os conceitos, propôs a estrutura de classes e gerou trechos de código. Cada etapa foi revisada, testada e integrada pelo grupo, como mostra o histórico de commits.
