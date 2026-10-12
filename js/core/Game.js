@@ -16,6 +16,7 @@ class Game {
         this.input = new InputHandler();
         this.camera = new Camera();
         this.score = new ScoreManager();
+        this.sound = new SoundManager();
         this.world = new World();
         this.capybara = null;   // criada em startGame()
         this.jaguar = null;     // criada em startGame()
@@ -86,6 +87,7 @@ class Game {
         this.world = new World();
         this.capybara = null;
         this.jaguar = null;
+        this.sound.stopAll();
         this.camera.y = CONFIG.TILE - CONFIG.HEIGHT; // mostra o início do mapa
         this.changeScreen('menu');
     }
@@ -114,11 +116,13 @@ class Game {
 
         this.score.reset();
         this.input.clear();
+        this.sound.stopAll(); // corta a musiquinha da partida anterior
     }
 
     /** Pausa a partida (só faz sentido durante o jogo). */
     pause() {
         if (this.currentScreen !== this.screens.play) return;
+        this.sound.stopAll(); // ex.: a buzina do trem não continua no pause
         this.changeScreen('pause');
     }
 
@@ -133,6 +137,7 @@ class Game {
     win() {
         if (this.currentScreen !== this.screens.play) return;
         this.score.finishRun(true); // medalha e recorde
+        this.sound.play('win');
         this.changeScreen('victory');
     }
 
@@ -146,6 +151,7 @@ class Game {
         this.capybara.die();
         this.deathMessage = message;
         this.score.finishRun(false); // sem medalha, mas pode bater recorde
+        this.sound.play('lose', { delay: 0.6 }); // depois do som da batida
         this.changeScreen('gameover');
     }
 
@@ -183,6 +189,8 @@ class Game {
     }
 
     update(dt) {
+        // M liga e desliga o som em qualquer tela
+        if (this.input.consumeMute()) this.sound.toggleMute();
         this.currentScreen.update(dt); // polimorfismo: cada tela faz o seu
     }
 

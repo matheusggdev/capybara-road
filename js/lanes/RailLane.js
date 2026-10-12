@@ -32,7 +32,7 @@ class RailLane extends Lane {
      * e avança a máquina de estados.
      * @param {number} dt
      */
-    update(dt) {
+    update(dt, game) {
         super.update(dt);
         this.timer -= dt;
         this.blinkTime += dt;
@@ -42,6 +42,7 @@ class RailLane extends Lane {
                 if (this.timer <= 0) {
                     this.state = 'warning';
                     this.timer = RailLane.WARNING_TIME;
+                    this.playHorn(game);
                 }
                 break;
 
@@ -65,6 +66,12 @@ class RailLane extends Lane {
         }
     }
 
+    /** Buzina do trem, mas só se o trilho estiver na tela. */
+    playHorn(game) {
+        if (game && this.isVisible(game.camera)) {
+            game.sound.play('train');
+        }
+    }
     /** Cria o trem logo fora da tela, do lado de onde ele vem. */
     spawnTrain() {
         const length = RailLane.TRAIN_LENGTH * CONFIG.TILE;

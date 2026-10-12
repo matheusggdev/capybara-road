@@ -26,6 +26,7 @@ Também funciona com a extensão **Live Server** do VS Code.
 | --- | --- |
 | Setas ou W A S D | Andar (um quadrado por toque) |
 | P ou Esc | Pausar e continuar |
+| M | Ligar e desligar o som (também há um botão na tela) |
 
 - Atravesse as **100 faixas** do mapa até a linha de chegada.
 - Cuidado com **carros**, **ônibus**, **trens** e **jacarés**.
@@ -54,6 +55,7 @@ capybara-road/
 ├── index.html            Página do jogo; carrega os scripts na ordem certa
 ├── css/style.css         Aparência da página ao redor do jogo
 ├── assets/images/        Imagens do menu
+├── assets/sounds/        Efeitos sonoros
 └── js/
     ├── config.js         Constantes, funções utilitárias e paleta de cores
     ├── main.js           Ponto de partida: cria o jogo
@@ -105,6 +107,7 @@ classDiagram
     Screen <|-- VictoryScreen
 
     Button <|-- IconButton
+    IconButton <|-- SoundButton
     Button <|-- ImageButton
 
     class Entity {
@@ -161,6 +164,7 @@ classDiagram
     Game *-- Camera
     Game *-- InputHandler
     Game *-- ScoreManager
+    Game *-- SoundManager
     Game *-- Screen
     Game o-- Capybara
     Game o-- Jaguar
@@ -232,5 +236,9 @@ O mesmo princípio aparece em outros lugares:
 - **Bíblia visual** (paleta, estilo dos personagens e da interface): <a href="https://github.com/melolivaa">Mel Oliva Motta</a>.
 - **Arte do menu:** gerada com ChatGPT (OpenAI) e adaptada pelo grupo (recortes do logo, do botão e da camada de nuvens).
 - **Fontes:** [Baloo 2](https://fonts.google.com/specimen/Baloo+2) e [Nunito](https://fonts.google.com/specimen/Nunito) (Google Fonts), sob a SIL Open Font License. Os arquivos ficam em `assets/fonts`, junto das licenças, para o jogo funcionar sem internet.
+- **Sons:**
+  - [Kenney](https://kenney.nl) (licença CC0): pacotes *Interface Sounds* (pulo, laranja, clique), *Impact Sounds* (atropelamento, mordida do jacaré) e *Music Jingles* (vitória e derrota).
+  - [Pixabay](https://pixabay.com/sound-effects/) (Pixabay Content License): "Lion Roar AI Cinematic", de virtualzero (onça); "Loud Train Horn Blast with High Speed Flyby", de chrysalyn (trem); e "Splashing Water", de DRAGON-STUDIO (água).
+  - Os sons foram cortados, convertidos para MP3 e tiveram o volume ajustado pelo grupo.
 - **Desenvolvimento:** o código foi construído de forma incremental com o auxílio do assistente de IA **Claude** (Anthropic), que explicou os conceitos, propôs a estrutura de classes e gerou trechos de código. Cada etapa foi revisada, testada e integrada pelo grupo, como mostra o histórico de commits.
 - Todos os personagens, veículos e cenários do jogo são desenhados por código, com as formas do Canvas.

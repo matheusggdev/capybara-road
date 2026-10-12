@@ -112,6 +112,7 @@ class Jaguar extends Entity {
      * @param {Game} game
      */
     onPlayerCollision(game) {
+        game.sound.play('roar');
         game.gameOver('A onça te pegou!');
     }
 

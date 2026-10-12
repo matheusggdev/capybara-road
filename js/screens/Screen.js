@@ -64,11 +64,13 @@ class Screen {
         }
     }
 
-    /** Repassa o clique ao botão que estiver embaixo do mouse. */
     handleClick(x, y) {
         for (const button of this.buttons) {
             if (button.contains(x, y)) {
                 button.click();
+                // o som vem DEPOIS: a ação do botão pode chamar stopAll()
+                // (ex.: começar a partida), e isso cortaria o clique
+                this.game.sound.play('click');
                 return; // o clique pode trocar de tela: para por aqui
             }
         }

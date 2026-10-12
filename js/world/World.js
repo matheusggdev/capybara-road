@@ -157,9 +157,13 @@ class World {
         return this.lanes.get(row) || null;
     }
 
-    update(dt) {
+    /**
+     * @param {number} dt
+     * @param {Game} [game] só durante a partida: usado para tocar sons
+     */
+    update(dt, game) {
         for (const lane of this.lanes.values()) {
-            lane.update(dt);
+            lane.update(dt, game);
         }
     }
 

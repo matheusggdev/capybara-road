@@ -39,6 +39,7 @@ class Vehicle extends MovingEntity {
      * @param {Game} game
      */
     onPlayerCollision(game) {
+        game.sound.play('crash');
         game.gameOver(this.getDeathMessage());
     }
 

@@ -41,6 +41,7 @@ class Alligator extends MovingEntity {
      * @param {Game} game
      */
     onPlayerCollision(game) {
+        game.sound.play('chomp');
         game.gameOver('Virou lanche de jacaré!');
     }
 

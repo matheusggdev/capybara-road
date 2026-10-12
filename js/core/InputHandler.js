@@ -11,9 +11,13 @@ class InputHandler {
     /** Teclas que pedem pause. */
     static PAUSE_KEYS = ['KeyP', 'Escape'];
 
+    /** Tecla que liga e desliga o som. */
+    static MUTE_KEY = 'KeyM';
+
     constructor() {
         this.moveQueue = [];
         this.pauseRequested = false;
+        this.muteRequested = false;
 
         // Tabela: código da tecla -> direção do movimento
         this.keyMap = {
@@ -38,6 +42,11 @@ class InputHandler {
         if (InputHandler.PAUSE_KEYS.includes(event.code)) {
             event.preventDefault();
             this.pauseRequested = true;
+            return;
+        }
+        // Som
+        if (event.code === InputHandler.MUTE_KEY) {
+            this.muteRequested = true;
             return;
         }
 
@@ -72,15 +81,14 @@ class InputHandler {
     }
 
     /**
-     * Devolve só o movimento MAIS RECENTE da fila e descarta os outros.
-     * Usado na água: como a braçada é lenta, as teclas antigas já
-     * ficaram "velhas" e vale a última intenção do jogador.
-     * @returns {string|null}
+     * Diz se o jogador apertou M para ligar/desligar o som,
+     * e "abaixa a bandeira" (vale uma vez por toque).
+     * @returns {boolean}
      */
-    consumeLatestMove() {
-        const latest = this.moveQueue.pop() || null;
-        this.moveQueue = [];
-        return latest;
+    consumeMute() {
+        const requested = this.muteRequested;
+        this.muteRequested = false;
+        return requested;
     }
 
     /** Esquece tudo o que estava pendente (ex.: ao começar ou retomar a partida). */

@@ -52,6 +52,11 @@ class MenuScreen extends Screen {
             () => this.startOpening()
         ));
 
+        // ligar/desligar o som, no canto superior direito
+        const size = 44;
+        const margin = 16;
+        this.buttons.push(new SoundButton(CONFIG.WIDTH - margin - size, margin, size, game.sound));
+
         // cortina de nuvens: 0 = fechada (cobrindo tudo), 1 = aberta
         this.openness = 0;
         this.state = 'idle'; // 'idle', 'opening' ou 'closing'

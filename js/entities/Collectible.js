@@ -65,6 +65,7 @@ class Orange extends Collectible {
     collect(game) {
         game.score.addOrange();
         game.capybara.hasOrange = true;
+        game.sound.play('orange');  
     }
 
     /**
