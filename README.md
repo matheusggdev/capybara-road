@@ -231,6 +231,6 @@ O mesmo princípio aparece em outros lugares:
 - **Inspiração:** Crossy Road (Hipster Whale) e Frogger (Konami).
 - **Bíblia visual** (paleta, estilo dos personagens e da interface): <a href="https://github.com/melolivaa">Mel Oliva Motta</a>.
 - **Arte do menu:** gerada com ChatGPT (OpenAI) e adaptada pelo grupo (recortes do logo, do botão e da camada de nuvens).
-- **Fontes:** [Baloo 2](https://fonts.google.com/specimen/Baloo+2) e [Nunito](https://fonts.google.com/specimen/Nunito), via Google Fonts, sob a SIL Open Font License.
+- **Fontes:** [Baloo 2](https://fonts.google.com/specimen/Baloo+2) e [Nunito](https://fonts.google.com/specimen/Nunito) (Google Fonts), sob a SIL Open Font License. Os arquivos ficam em `assets/fonts`, junto das licenças, para o jogo funcionar sem internet.
 - **Desenvolvimento:** o código foi construído de forma incremental com o auxílio do assistente de IA **Claude** (Anthropic), que explicou os conceitos, propôs a estrutura de classes e gerou trechos de código. Cada etapa foi revisada, testada e integrada pelo grupo, como mostra o histórico de commits.
 - Todos os personagens, veículos e cenários do jogo são desenhados por código, com as formas do Canvas.
