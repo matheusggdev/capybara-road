@@ -196,16 +196,17 @@ class MenuScreen extends Screen {
 
     /**
      * Os controles: um cartão com as teclas desenhadas
-     * (setas para andar, P para pausar).
+     * (setas para andar, P para pausar, M para o som).
      */
     drawControls(ctx) {
         const keySize = 28;
         const gap = 6;
         const height = 54;
-        const width = 372;
+        const width = 474;
         const x = (CONFIG.WIDTH - width) / 2;
         const y = 590;
         const keyY = y + (height - keySize) / 2 - 2;
+        const labelY = y + height / 2;
 
         this.drawSticker(ctx, x, y, width, height, PALETTE.PAPEL);
 
@@ -215,16 +216,25 @@ class MenuScreen extends Screen {
             this.drawKey(ctx, keyX, keyY, keySize, direction);
             keyX += keySize + gap;
         }
-        this.drawLabel(ctx, 'Andar', keyX + 6, y + height / 2);
-
-        // divisória
-        const dividerX = x + 232;
-        ctx.fillStyle = 'rgba(43, 36, 32, 0.2)';
-        ctx.fillRect(dividerX, y + 12, 2, height - 24);
+        this.drawLabel(ctx, 'Andar', keyX + 6, labelY);
 
         // pausa
-        this.drawKey(ctx, dividerX + 16, keyY, keySize, 'P');
-        this.drawLabel(ctx, 'Pausar', dividerX + 16 + keySize + 10, y + height / 2);
+        const pauseX = x + 232;
+        this.drawDivider(ctx, pauseX, y, height);
+        this.drawKey(ctx, pauseX + 16, keyY, keySize, 'P');
+        this.drawLabel(ctx, 'Pausar', pauseX + 16 + keySize + 10, labelY);
+
+        // som
+        const soundX = x + 364;
+        this.drawDivider(ctx, soundX, y, height);
+        this.drawKey(ctx, soundX + 16, keyY, keySize, 'M');
+        this.drawLabel(ctx, 'Som', soundX + 16 + keySize + 10, labelY);
+    }
+
+    /** Linha vertical clarinha que separa os grupos de teclas. */
+    drawDivider(ctx, x, y, height) {
+        ctx.fillStyle = 'rgba(43, 36, 32, 0.2)';
+        ctx.fillRect(x, y + 12, 2, height - 24);
     }
 
     /**

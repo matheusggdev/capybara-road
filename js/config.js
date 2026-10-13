@@ -37,7 +37,7 @@ const CONFIG = Object.freeze({
     RAIL_INTERVAL_MAX: 6, // tempo máximo entre trens, em segundos
 
     // Onça
-    JAGUAR_SPEED: 0.9,          // faixas por segundo (1 faixa a cada 2 s)
+    JAGUAR_SPEED: 0.9,          // faixas por segundo (1 faixa a cada ~1,1 s)
     JAGUAR_START_ROW: -4,       // começa escondida na mata, atrás da cerca
     JAGUAR_START_DELAY: 3,      // segundos parada antes de começar a correr
     JAGUAR_CATCH_DURATION: 0.35 // segundos para deslizar até a capivara
