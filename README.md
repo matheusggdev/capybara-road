@@ -1,3 +1,7 @@
+<p align="center">
+<img src="assets/images/banner-capybara-road.webp" alt="BANNER-ClassSync" border="0">
+</p>
+
 # Capybara Road 🦫🍊
 
 Jogo 2D de navegador inspirado em **Crossy Road** e **Frogger**, feito em JavaScript puro com HTML5 Canvas.
