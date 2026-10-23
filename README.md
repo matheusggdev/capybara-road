@@ -64,7 +64,7 @@ capybara-road/
 └── js/
     ├── config.js         Constantes, funções utilitárias e paleta de cores
     ├── main.js           Ponto de partida: cria o jogo
-    ├── core/             O "motor": loop, câmera, teclado e pontuação
+    ├── core/             O "motor": loop, câmera, teclado, pontuação e som
     ├── entities/         Tudo o que existe no mapa (capivara, veículos, onça...)
     ├── lanes/            Os tipos de faixa (grama, estrada, rio, trilho...)
     ├── world/            O mapa: monta e guarda as faixas
