@@ -1,5 +1,5 @@
 <p align="center">
-<img src="assets/images/banner-capybara-road.webp" alt="BANNER-ClassSync" border="0">
+<img src="assets/images/banner-capybara-road.webp" alt="BANNER-capybara-road" border="0">
 </p>
 
 # Capybara Road 🦫🍊
@@ -35,7 +35,7 @@ Também funciona com a extensão **Live Server** do VS Code.
 - Atravesse as **100 faixas** do mapa até a linha de chegada.
 - Cuidado com **carros**, **ônibus**, **trens** e **jacarés**.
 - A **onça** persegue a capivara por trás: quem fica parado muito tempo é alcançado.
-- No rio, a capivara **nada**.
+- No rio, a capivara **nada**, e nadando ela fica mais lenta.
 - Árvores e pedras bloqueiam o caminho, mas sempre existe uma passagem livre.
 - O jogo pausa sozinho se você trocar de aba ou de janela.
 
@@ -60,10 +60,11 @@ capybara-road/
 ├── css/style.css         Aparência da página ao redor do jogo
 ├── assets/images/        Imagens do menu
 ├── assets/sounds/        Efeitos sonoros
+├── assets/fonts/         Fontes Baloo 2 e Nunito, com as licenças
 └── js/
     ├── config.js         Constantes, funções utilitárias e paleta de cores
     ├── main.js           Ponto de partida: cria o jogo
-    ├── core/             O "motor": loop, câmera, teclado e pontuação
+    ├── core/             O "motor": loop, câmera, teclado, pontuação e som
     ├── entities/         Tudo o que existe no mapa (capivara, veículos, onça...)
     ├── lanes/            Os tipos de faixa (grama, estrada, rio, trilho...)
     ├── world/            O mapa: monta e guarda as faixas
@@ -224,7 +225,7 @@ O mesmo princípio aparece em outros lugares:
 
 - **Faixas:** o `World` chama `lane.drawBackground()` e `lane.isBlocked()`, e cada tipo de faixa responde do seu jeito. A `FinishLane` usa `onPlayerInside()` para declarar a vitória, e a `RiverLane` responde `isWater = true` para a capivara nadar.
 - **Telas (padrão State):** o `Game` só chama `currentScreen.update()` e `currentScreen.draw()`. Menu, jogo, pause, derrota e vitória são classes diferentes, cada uma com o seu comportamento.
-- **Botões:** a tela chama `button.contains()` e `button.draw()`. O `IconButton` (pause) testa um círculo em vez de um retângulo, e o `ImageButton` (menu) usa uma imagem.
+- **Botões:** a tela chama `button.contains()` e `button.draw()`. O `IconButton` (pause) testa um círculo em vez de um retângulo, o `SoundButton` herda dele e só troca o ícone, e o `ImageButton` (menu) usa uma imagem.
 
 ### Padrões de projeto usados
 
